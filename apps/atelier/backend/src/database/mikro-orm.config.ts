@@ -11,7 +11,7 @@ export default defineConfig({
   },
   extensions: [Migrator],
   clientUrl: process.env.DATABASE_URL,
-  driverOptions: {
-    ssl: { rejectUnauthorized: false },
-  },
+  // driverOptions: {
+  //   ssl: { rejectUnauthorized: false },
+  // },
 });
