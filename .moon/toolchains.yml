@@ -1,0 +1,14 @@
+
+
+javascript:
+  dedupeOnLockfileChange: true
+  inferTasksFromScripts: true
+  packageManager: pnpm
+  syncProjectWorkspaceDependencies: true
+
+
+typescript:
+  includeProjectReferenceSources: true
+  includeSharedTypes: true
+  syncProjectReferences: true
+  syncProjectReferencesToPaths: true

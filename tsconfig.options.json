@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    // options required for moonrepo
+    "composite": true,
+    "declaration": true,
+    "declarationMap": true,
+    "incremental": true,
+    "noEmitOnError": true,
+    "skipLibCheck": true,
+    // strictness checks
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
+    "verbatimModuleSyntax": true
+  }
+}
