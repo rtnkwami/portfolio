@@ -2,8 +2,10 @@
 
 projects:
   portfolio: "apps/portfolio"
+  
   atelier/backend: "apps/atelier/backend"
   atelier/frontend: "apps/atelier/frontend"
+  atelier/contracts: "packages/atelier/contracts"
 
 vcs:
   defaultBranch: "main"
