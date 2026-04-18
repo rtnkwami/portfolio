@@ -6,6 +6,9 @@
       "path": "./apps/atelier/backend"
     },
     {
+      "path": "./apps/atelier/frontend"
+    },
+    {
       "path": "./apps/portfolio"
     }
   ]
