@@ -3,6 +3,9 @@
   "files": [],
   "references": [
     {
+      "path": "./apps/atelier/backend"
+    },
+    {
       "path": "./apps/portfolio"
     }
   ]

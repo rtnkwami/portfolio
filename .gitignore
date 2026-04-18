@@ -5,3 +5,6 @@ node_modules
 .moon/docker
 lib/
 *.tsbuildinfo
+
+dist/
+coverage
