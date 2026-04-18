@@ -16,18 +16,28 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:cov": "vitest run --coverage",
-    "test:debug": "vitest --inspect-brk --no-file-parallelism"
+    "test:debug": "vitest --inspect-brk --no-file-parallelism",
+    "run-migration": "mikro-orm migration:up",
+    "create-migration": "mikro-orm migration:create",
+    "revert-migration": "mikro-orm migration:down",
+    "list-migrations": "mikro-orm migration:list"
   },
   "dependencies": {
+    "@mikro-orm/core": "^7.0.11",
+    "@mikro-orm/migrations": "^7.0.11",
+    "@mikro-orm/nestjs": "^7.0.1",
+    "@mikro-orm/postgresql": "^7.0.11",
     "@nestjs/common": "^11.0.1",
     "@nestjs/core": "^11.0.1",
     "@nestjs/platform-express": "^11.0.1",
+    "dotenv": "^17.4.2",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",
     "@eslint/js": "^9.18.0",
+    "@mikro-orm/cli": "^7.0.11",
     "@nestjs/cli": "^11.0.0",
     "@nestjs/schematics": "^11.0.0",
     "@nestjs/testing": "^11.0.1",
@@ -51,5 +61,10 @@
     "typescript-eslint": "^8.20.0",
     "unplugin-swc": "^1.5.9",
     "vitest": "^4.1.4"
+  },
+  "mikro-orm": {
+    "configPaths": [
+      "./src/database/mikro-orm.config.ts"
+    ]
   }
 }
