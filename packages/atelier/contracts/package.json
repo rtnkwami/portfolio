@@ -21,14 +21,21 @@
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.cts",
   "exports": {
-    "./schemas": {
-      "import": "./dist/schemas/index.mjs",
-      "require": "./dist/schemas/index.cjs"
-    },
-    "./types": {
-      "import": "./dist/types/index.mjs",
-      "require": "./dist/types/index.cjs"
-    },
+    "./schemas": "./src/schemas/index.ts",
+    "./types": "./src/types/index.ts",
     "./package.json": "./package.json"
+  },
+  "publishConfig": {
+    "exports": {
+      "./schemas": {
+        "import": "./dist/schemas/index.mjs",
+        "require": "./dist/schemas/index.cjs"
+      },
+      "./types": {
+        "import": "./dist/types/index.mjs",
+        "require": "./dist/types/index.cjs"
+      },
+      "./package.json": "./package.json"
+    }
   }
 }

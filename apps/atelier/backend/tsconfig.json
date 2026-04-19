@@ -8,6 +8,7 @@
     "esModuleInterop": true,
     "isolatedModules": true,
     "declaration": true,
+    "baseUrl": ".",
     "removeComments": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
@@ -21,6 +22,16 @@
     "forceConsistentCasingInFileNames": true,
     "noImplicitAny": false,
     "strictBindCallApply": false,
-    "noFallthroughCasesInSwitch": false
-  }
+    "noFallthroughCasesInSwitch": false,
+    "paths": {
+      "src/*": [
+        "./src/*"
+      ]
+    }
+  },
+  "references": [
+    {
+      "path": "../../../packages/atelier/contracts"
+    }
+  ]
 }

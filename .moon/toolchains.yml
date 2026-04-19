@@ -8,10 +8,10 @@ javascript:
 
 
 typescript:
-  includeProjectReferenceSources: true
+  includeProjectReferenceSources: false
   includeSharedTypes: true
   syncProjectReferences: true
-  syncProjectReferencesToPaths: true
+  syncProjectReferencesToPaths: false
 
 
 node:
