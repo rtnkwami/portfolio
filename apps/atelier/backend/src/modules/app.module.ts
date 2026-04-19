@@ -8,10 +8,29 @@ import { ConfigModule } from '@nestjs/config';
 import { envValidate } from '../env.validation';
 import { AuthMiddleware } from '../middleware/auth.middleware';
 import { UserModule } from './user/user.module';
+import { LoggerModule } from 'nestjs-pino';
+import { Request, Response } from 'express';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true, validate: envValidate }),
+    LoggerModule.forRoot({
+      pinoHttp: {
+        serializers: {
+          res: (res: Response) => ({
+            statusCode: res.statusCode,
+          }),
+          req: (req: Request) => ({
+            id: req.id,
+            method: req.method,
+            url: req.url,
+            query: req.query,
+            params: req.params,
+            userAgent: req.headers['user-agent'],
+          }),
+        },
+      },
+    }),
     MikroOrmModule.forRoot({
       ...dbConfig,
       entities: [],
@@ -28,7 +47,7 @@ export class AppModule {
   configure(consumer: MiddlewareConsumer) {
     consumer
       .apply(AuthMiddleware)
-      .exclude({ path: 'inventory/*', method: RequestMethod.GET })
+      .exclude({ path: 'inventory', method: RequestMethod.GET })
       .forRoutes('*');
   }
 }
