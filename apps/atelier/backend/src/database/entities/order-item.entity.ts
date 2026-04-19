@@ -1,6 +1,6 @@
 import { BaseEntity, DecimalType, type Ref, ref } from '@mikro-orm/core';
 import { Order } from './order.entity';
-import { Product } from './product.entity';
+import { type Product as ProductType, Product } from './product.entity';
 import { randomUUID } from 'crypto';
 import {
   Property,
@@ -30,7 +30,12 @@ export class OrderItem extends BaseEntity {
   @ManyToOne({ entity: () => Product, ref: true })
   product: Ref<Product>;
 
-  constructor(order: Order, product: Product, quantity: number, price: number) {
+  constructor(
+    order: Order,
+    product: ProductType,
+    quantity: number,
+    price: number,
+  ) {
     super();
     this.order = ref(order);
     this.product = ref(product);

@@ -7,7 +7,7 @@ import {
 import { type Ref, ref } from '@mikro-orm/core';
 import { randomUUID } from 'crypto';
 import { Reservation } from './reservation.entity';
-import { Product } from './product.entity';
+import { type Product as ProductType, Product } from './product.entity';
 
 @Entity()
 export class ReservationItem {
@@ -23,7 +23,11 @@ export class ReservationItem {
   @ManyToOne({ entity: () => Reservation, ref: true })
   reservation: Ref<Reservation>;
 
-  constructor(product: Product, reservation: Reservation, quantity: number) {
+  constructor(
+    product: ProductType,
+    reservation: Reservation,
+    quantity: number,
+  ) {
     this.product = ref(product);
     this.reservation = ref(reservation);
     this.quantity = quantity;
