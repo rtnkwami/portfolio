@@ -3,6 +3,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { MikroOrmModule } from '@mikro-orm/nestjs';
 import dbConfig from './database/mikro-orm.config';
+import { InventoryModule } from './modules/inventory/inventory.module';
 
 @Module({
   imports: [
@@ -12,6 +13,7 @@ import dbConfig from './database/mikro-orm.config';
       entitiesTs: [],
       autoLoadEntities: true,
     }),
+    InventoryModule,
   ],
   controllers: [AppController],
   providers: [AppService],

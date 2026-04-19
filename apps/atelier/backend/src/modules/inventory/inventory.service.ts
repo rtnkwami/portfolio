@@ -1,0 +1,299 @@
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+import {
+  EntityManager,
+  FilterQuery,
+  LockMode,
+  TransactionPropagation,
+  wrap,
+} from '@mikro-orm/postgresql';
+import type {
+  CommitStockParams,
+  CreateProductParams,
+  ReserveStockParams,
+  SearchProductParams,
+  UpdateProductParams,
+} from '@atelier/contracts/types';
+import { Product } from 'src/database/entities/product.entity';
+import { Transactional } from '@mikro-orm/decorators/legacy';
+import { Reservation } from 'src/database/entities/reservation.entity';
+import { ReservationItem } from 'src/database/entities/reservation-item.entity';
+
+@Injectable()
+export class InventoryService {
+  constructor(private readonly em: EntityManager) {}
+
+  public async create(data: CreateProductParams) {
+    const product = this.em.create(Product, data);
+    await this.em.flush();
+
+    const returnDTO = {
+      id: product.id,
+      name: product.name,
+      description: product.description,
+      category: product.category,
+      price: product.price,
+      stock: product.stock,
+      images: product.images,
+      createdAt: product.createdAt.toISOString(),
+      updatedAt: product.updatedAt.toISOString(),
+    };
+
+    return returnDTO;
+  }
+
+  public async quickSearch(name: string) {
+    const results = await this.em.findAll(Product, {
+      where: { name: { $ilike: `${name}%` } },
+    });
+
+    const dto = {
+      data: results.map((product) => ({
+        id: product.id,
+        name: product.name,
+      })),
+    };
+
+    return dto;
+  }
+
+  public async getProductCategories() {
+    const results = await this.em.findAll(Product, {
+      fields: ['category'],
+    });
+
+    const dto = {
+      categories: [...new Set(results.map((product) => product.category))],
+    };
+
+    return dto;
+  }
+
+  public async search(filters: SearchProductParams) {
+    const {
+      page = 1,
+      limit = 20,
+      name,
+      category,
+      minPrice,
+      maxPrice,
+    } = filters;
+    const offset = (page - 1) * limit;
+    const search: FilterQuery<Product> = {};
+
+    if (name) {
+      search.name = { $ilike: `${name}%` };
+    }
+
+    if (category) {
+      search.category = category;
+    }
+
+    if (minPrice || maxPrice) {
+      search.price = {};
+      if (minPrice) search.price.$gte = minPrice;
+      if (maxPrice) search.price.$lte = maxPrice;
+    }
+
+    const [results, count] = await this.em.findAndCount(
+      Product,
+      { ...search },
+      { limit, offset },
+    );
+
+    const dto = results.map((product) => ({
+      id: product.id,
+      name: product.name,
+      description: product.description,
+      category: product.category,
+      price: product.price,
+      images: product.images,
+    }));
+
+    return {
+      products: dto,
+      page,
+      perPage: limit,
+      totalItems: count,
+      totalPages: Math.ceil(count / limit),
+    };
+  }
+
+  public async getProduct(id: string) {
+    const product = await this.em.findOne(Product, id);
+
+    if (!product) {
+      throw new NotFoundException(`Product ${id} does not exist`);
+    }
+
+    const dto = {
+      id: product.id,
+      name: product.name,
+      description: product.description,
+      category: product.category,
+      price: product.price,
+      stock: product.stock,
+      images: product.images,
+    };
+
+    return dto;
+  }
+
+  @Transactional()
+  public async updateProduct(id: string, data: UpdateProductParams) {
+    const product = await this.em.findOne(Product, id);
+
+    if (!product) {
+      throw new NotFoundException(`Product ${id} does not exist`);
+    }
+    wrap(product).assign(data);
+
+    const dto = {
+      id: product.id,
+      name: product.name,
+      description: product.description,
+      category: product.category,
+      price: product.price,
+      stock: product.stock,
+      images: product.images,
+      createdAt: product.createdAt.toISOString(),
+      updatedAt: product.updatedAt.toISOString(),
+    };
+    return dto;
+  }
+
+  @Transactional()
+  public async deleteProduct(id: string) {
+    const product = await this.em.findOne(Product, id);
+
+    if (!product) {
+      throw new NotFoundException(`Product ${id} does not exist`);
+    }
+    this.em.remove(product);
+
+    return { deleted: product.id };
+  }
+
+  private async findOrCreateReservation(id: string) {
+    const existing = await this.em.findOne(
+      Reservation,
+      { id },
+      { populate: ['items'] },
+    );
+    const reservation = existing ?? new Reservation();
+
+    if (!existing) {
+      reservation.id = id;
+      this.em.persist(reservation);
+    }
+    return reservation;
+  }
+
+  private async validateProductStock(id: string, requestedQty: number) {
+    const product = await this.em.findOne(
+      Product,
+      { id },
+      {
+        lockMode: LockMode.PESSIMISTIC_WRITE, // use this lock mode to make transactions trying the same operations wait until the first one served finishes.
+        populate: ['reservations'],
+      },
+    );
+
+    if (!product) {
+      throw new NotFoundException(`Product ${id} does not exist`);
+    }
+
+    const reservedStock = product.reservations.reduce(
+      (acc, item) => acc + item.quantity,
+      0,
+    );
+    const totalRequestedStock = reservedStock + requestedQty;
+
+    if (product.stock - totalRequestedStock < 0) {
+      throw new BadRequestException({
+        message: `insufficient stock for product ${product.id}`,
+        reason: {
+          requested: requestedQty,
+          stock: product.stock - reservedStock,
+        },
+      });
+    }
+    return product;
+  }
+
+  @Transactional({ propagation: TransactionPropagation.REQUIRED })
+  public async reserveInventory(data: ReserveStockParams) {
+    const sortedRequestItems = [...data.items].sort((a, b) =>
+      a.id.localeCompare(b.id),
+    );
+    const reservation = await this.findOrCreateReservation(data.orderId);
+
+    const reservationItems: ReservationItem[] = [];
+
+    for (const requested of sortedRequestItems) {
+      const product = await this.validateProductStock(
+        requested.id,
+        requested.quantity,
+      );
+
+      const item = new ReservationItem(
+        product,
+        reservation,
+        requested.quantity,
+      );
+      reservationItems.push(item);
+    }
+    reservation.items.set(reservationItems);
+    return { orderId: data.orderId };
+  }
+
+  @Transactional({ propagation: TransactionPropagation.REQUIRED })
+  public async commitInventoryReservation(data: CommitStockParams) {
+    const reservation = await this.em.findOne(
+      Reservation,
+      { id: data.reservationId },
+      {
+        populate: ['items'],
+        populateOrderBy: {
+          items: {
+            product: { id: 'asc' },
+          },
+        },
+      },
+    );
+
+    if (!reservation) {
+      throw new BadRequestException(
+        `Reservation ${data.reservationId} does not exist`,
+      );
+    }
+
+    const productIds: string[] = [];
+    const reservedItems = reservation.items.getItems();
+
+    reservedItems.forEach((item) => {
+      productIds.push(item.product.id);
+    });
+
+    const products = await this.em.findAll(Product, {
+      where: {
+        id: { $in: productIds },
+      },
+      lockMode: LockMode.PESSIMISTIC_WRITE,
+    });
+
+    products.forEach((product) => {
+      const reservedItem = reservedItems.find(
+        (item) => item.product.id === product.id,
+      );
+      if (reservedItem) {
+        product.stock -= reservedItem.quantity;
+        reservation.items.remove(reservedItem);
+      }
+    });
+    this.em.remove(reservation);
+  }
+}
