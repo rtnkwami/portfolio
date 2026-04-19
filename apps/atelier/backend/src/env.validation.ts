@@ -5,6 +5,7 @@ export const envSchema = z.object({
   DATABASE_URL: z.url({ protocol: /^postgres(ql)?$/ }),
   ISSUER_BASE_URL: z.url({ protocol: /^https$/ }),
   REDIS_ENDPOINT: z.url({ protocol: /^redis$/ }),
+  AUDIENCE: z.string().nonempty(),
 });
 
 export function envValidate(envVariables: Record<string, unknown>) {
