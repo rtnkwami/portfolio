@@ -9,10 +9,7 @@ import KeyvRedis from '@keyv/redis';
     CacheModule.registerAsync({
       useFactory: () => ({
         stores: [
-          new KeyvRedis(
-            process.env.REDIS_ENDPOINT || 'redis://localhost:6379',
-            { namespace: 'cart' },
-          ),
+          new KeyvRedis(process.env.REDIS_ENDPOINT, { namespace: 'cart' }),
         ],
         ttl: 7 * 24 * 60 * 60 * 1000,
       }),
