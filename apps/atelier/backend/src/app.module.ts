@@ -8,6 +8,7 @@ import { CartModule } from './modules/cart/cart.module';
 import { ConfigModule } from '@nestjs/config';
 import { envValidate } from './env.validation';
 import { AuthMiddleware } from './middleware/auth.middleware';
+import { UserModule } from './modules/user/user.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { AuthMiddleware } from './middleware/auth.middleware';
     }),
     InventoryModule,
     CartModule,
+    UserModule,
   ],
   controllers: [AppController],
   providers: [AppService],
