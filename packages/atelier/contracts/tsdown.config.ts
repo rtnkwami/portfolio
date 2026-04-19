@@ -9,6 +9,6 @@ export default defineConfig({
   dts: true,
   clean: true,
   exports: {
-    devExports: true
+    devExports: 'source'
   }
 })
