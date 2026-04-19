@@ -4,6 +4,7 @@ import { AppService } from './app.service';
 import { MikroOrmModule } from '@mikro-orm/nestjs';
 import dbConfig from 'src/database/mikro-orm.config';
 import { InventoryModule } from './modules/inventory/inventory.module';
+import { CartModule } from './modules/cart/cart.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { InventoryModule } from './modules/inventory/inventory.module';
       autoLoadEntities: true,
     }),
     InventoryModule,
+    CartModule,
   ],
   controllers: [AppController],
   providers: [AppService],
