@@ -10,6 +10,7 @@ import { AuthMiddleware } from '../middleware/auth.middleware';
 import { UserModule } from './user/user.module';
 import { LoggerModule } from 'nestjs-pino';
 import { Request, Response } from 'express';
+import { OrderModule } from './order/order.module';
 
 @Module({
   imports: [
@@ -40,6 +41,7 @@ import { Request, Response } from 'express';
     InventoryModule,
     CartModule,
     UserModule,
+    OrderModule,
   ],
   controllers: [AppController],
 })
@@ -47,7 +49,10 @@ export class AppModule {
   configure(consumer: MiddlewareConsumer) {
     consumer
       .apply(AuthMiddleware)
-      .exclude({ path: 'inventory', method: RequestMethod.GET })
+      .exclude(
+        { path: 'inventory', method: RequestMethod.GET },
+        { path: 'healthy', method: RequestMethod.GET },
+      )
       .forRoutes('*');
   }
 }
