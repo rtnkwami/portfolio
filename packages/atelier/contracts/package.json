@@ -1,0 +1,49 @@
+{
+  "name": "@atelier/contracts",
+  "version": "1.0.0",
+  "description": "",
+  "main": "./dist/index.cjs",
+  "scripts": {
+    "build": "tsdown"
+  },
+  "type": "module",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.33.0",
+  "devDependencies": {
+    "tsdown": "^0.21.9",
+    "typescript": "^6.0.3"
+  },
+  "dependencies": {
+    "zod": "^4.3.6"
+  },
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.cts",
+  "exports": {
+    "./schemas": {
+      "source": "./src/schemas/index.ts",
+      "import": "./dist/schemas/index.mjs",
+      "require": "./dist/schemas/index.cjs"
+    },
+    "./types": {
+      "source": "./src/types/index.ts",
+      "import": "./dist/types/index.mjs",
+      "require": "./dist/types/index.cjs"
+    },
+    "./package.json": "./package.json"
+  },
+  "publishConfig": {
+    "exports": {
+      "./schemas": {
+        "import": "./dist/schemas/index.mjs",
+        "require": "./dist/schemas/index.cjs"
+      },
+      "./types": {
+        "import": "./dist/types/index.mjs",
+        "require": "./dist/types/index.cjs"
+      },
+      "./package.json": "./package.json"
+    }
+  }
+}

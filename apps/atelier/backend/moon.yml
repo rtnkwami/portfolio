@@ -1,0 +1,21 @@
+project:
+  name: Atelier Backend API
+  description: |
+    Atelier is an ecommerce application written to explore system design and DevOps.
+    This is the second half of the application: the backend API. As an overview, below is
+    the tech stack being used for this API:
+    - REST
+    - NestJS
+    - MikroORM
+    - PostgreSQL
+    - Redis
+
+  maintainers:
+    - Robert Kwami
+
+stack: backend
+
+dependsOn:
+  - atelier/contracts
+
+tags: [Atelier, Backend]
