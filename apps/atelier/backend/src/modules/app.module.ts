@@ -51,7 +51,7 @@ export class AppModule {
       .apply(AuthMiddleware)
       .exclude(
         { path: 'inventory', method: RequestMethod.GET },
-        { path: 'healthy', method: RequestMethod.GET },
+        { path: '/', method: RequestMethod.GET },
       )
       .forRoutes('*');
   }
