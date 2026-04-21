@@ -13,9 +13,15 @@ project:
   maintainers:
     - Robert Kwami
 
+tags: [Atelier, Backend]
+
 stack: backend
 
 dependsOn:
   - atelier/contracts
 
-tags: [Atelier, Backend]
+tasks:
+  build:
+    command: 'nest build'
+    deps:
+      - '^:build'
