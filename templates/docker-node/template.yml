@@ -1,0 +1,11 @@
+$schema: ../../.moon/cache/schemas/template.json
+title: Node Containerization
+description: Creates files necessary for containerization.
+
+destination: /apps/[project]
+
+variables:
+  project:
+    type: 'string'
+    required: true
+    prompt: What project to containerize?
