@@ -7,8 +7,8 @@ terraform {
   }
 
   backend "s3" {
-    bucket = "portfolio-tf-state"
-    key = "portfolio-eks-tstate"
+    bucket = "niovial-portfolio-tf-state"
+    key = "portfolio-eks-tfstate"
     encrypt = true
     region = var.deployment_region
     use_lockfile = true
