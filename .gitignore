@@ -9,3 +9,5 @@ lib/
 dist/
 coverage
 .env
+
+.terraform

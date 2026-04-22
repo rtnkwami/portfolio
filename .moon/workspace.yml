@@ -7,6 +7,8 @@ projects:
   atelier/frontend: "apps/atelier/frontend"
   atelier/contracts: "packages/atelier/contracts"
 
+  eks: infra/cluster
+
 vcs:
   defaultBranch: "main"
   provider: "github"
