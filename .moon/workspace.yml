@@ -10,3 +10,7 @@ projects:
 vcs:
   defaultBranch: "main"
   provider: "github"
+
+generator:
+  templates:
+    - "./.moon/templates"
