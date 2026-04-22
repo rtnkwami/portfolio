@@ -1,0 +1,23 @@
+project:
+  name: EKS 
+  description: |
+    This project deploys an EKS cluster to AWS so that other apps in this monorepo
+    can be deployed.
+
+  maintainers:
+    - Robert Kwami
+
+tags: [Root, EKS]
+
+stack: infrastructure
+
+tasks:
+  init:
+    command: 'tofu init'
+    toolchain: 'system'
+
+  plan:
+    command: 'tofu plan -out=tfplan'
+    toolchain: 'system'
+    deps: ['~:init']
+    outputs: ['tfplan']
