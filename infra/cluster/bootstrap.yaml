@@ -1,0 +1,16 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/awslabs/goformation/master/schema/cloudformation.schema.json
+AWSTemplateFormatVersion: 2010-09-09
+Description: Use CloudFormation to create the S3 bucket to store the terraform state for EKS
+
+Resources:
+  TerraformStateBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: portfolio-eks-tfstate
+      VersioningConfiguration:
+        Status: Enabled
+
+Outputs:
+  TfStateBucketName:
+    Value: !Ref TerraformStateBucket
+    
