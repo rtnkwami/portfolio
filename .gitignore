@@ -11,3 +11,4 @@ coverage
 .env
 
 *terraform*
+infra/cluster/.plans
