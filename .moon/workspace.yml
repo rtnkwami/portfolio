@@ -8,6 +8,7 @@ projects:
   atelier/contracts: "packages/atelier/contracts"
 
   eks: infra/cluster
+  scripts: scripts
 
 vcs:
   defaultBranch: "main"

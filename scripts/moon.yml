@@ -1,0 +1,4 @@
+tasks:
+  install-argocd:
+    description: 'Install ArgoCD via Helm'
+    script: 'bash argocd-install/install-argo.sh'
