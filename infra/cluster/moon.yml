@@ -22,15 +22,21 @@ tasks:
     toolchain: 'system'
     deps: ['~:init']
     outputs: ['.plans/tfplan']
+    options:
+      cache: false
 
   deploy:
     command: 'tofu apply .plans/tfplan'
     toolchain: 'system'
     deps: ['~:plan']
     inputs: ['.plans/tfplan']
+    options:
+      cache: false
 
   destroy:
     command: 'tofu destroy'
     args: '--auto-approve'
     toolchain: 'system'
     deps: ['~:init']
+    options:
+      cache: false
