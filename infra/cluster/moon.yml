@@ -17,7 +17,20 @@ tasks:
     toolchain: 'system'
 
   plan:
-    command: 'tofu plan -out=tfplan'
+    command: 'tofu plan'
+    args: '-out .plans/tfplan'
     toolchain: 'system'
     deps: ['~:init']
-    outputs: ['tfplan']
+    outputs: ['.plans/tfplan']
+
+  deploy:
+    command: 'tofu apply .plans/tfplan'
+    toolchain: 'system'
+    deps: ['~:plan']
+    inputs: ['.plans/tfplan']
+
+  destroy:
+    command: 'tofu destroy'
+    args: '--auto-approve'
+    toolchain: 'system'
+    deps: ['~:init']
