@@ -9,7 +9,7 @@ module "vpc" {
   public_subnets  = [for index, value in local.azs : cidrsubnet(var.vpc_cidr, 8, index + 112)]
 
   private_subnet_tags = {
-    "karpenter.sh/discovery" = var.project_name
+    "karpenter.sh/discovery" = "${var.project_name}-eks-cluster"
   }
 
   enable_dns_hostnames = true
@@ -55,6 +55,10 @@ module "eks" {
     eks-pod-identity-agent = {
       before_compute = true
     }
+  }
+
+  node_security_group_tags = {
+    "karpenter.sh/discovery" = "${var.project_name}-eks-cluster"
   }
 
   cluster_tags = {
