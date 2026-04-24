@@ -1,0 +1,18 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: argocd
+  namespace: argocd
+spec:
+  source:
+    repoURL: https://github.com/rtnkwami/portfolio.git
+    targetRevision: HEAD
+    path: infra/gitops/blueprint
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: argocd
+  project: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
