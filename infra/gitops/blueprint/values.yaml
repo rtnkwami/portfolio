@@ -11,7 +11,7 @@ system:
     syncWave: "-2"
   
   karpenter:
-    chart: kube-system
+    chart: karpenter
     repoURL: oci://public.ecr.aws/karpenter/karpenter
     targetRevision: 1.11.1
     namespace: kube-system
