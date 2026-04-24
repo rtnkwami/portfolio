@@ -1,4 +1,8 @@
-tasks:
-  install-argocd:
-    description: 'Install ArgoCD via Helm'
-    script: 'bash argocd-install/install-argo.sh'
+project:
+  name: Monorepo Scripts
+  description: |
+    This project contains all the scripts needed within the repo, from scripts in
+    CI/CD to scripts for installing or cleaning up resources in the repo.
+  
+  maintainers:
+    - Robert Kwami
