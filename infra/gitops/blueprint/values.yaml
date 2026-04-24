@@ -8,14 +8,14 @@ system:
     repoURL: oci://public.ecr.aws/karpenter/karpenter-crd
     targetRevision: 1.11.1
     namespace: kube-system
-    syncWave: "1"
+    syncWave: "-2"
   
   karpenter:
     chart: kube-system
     repoURL: oci://public.ecr.aws/karpenter/karpenter
     targetRevision: 1.11.1
     namespace: kube-system
-    syncWave: "2"
+    syncWave: "-1"
     values:
       settings:
         clusterName: portfolio-eks-cluster
