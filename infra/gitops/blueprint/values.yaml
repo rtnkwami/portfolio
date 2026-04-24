@@ -29,3 +29,10 @@ system:
     targetRevision: HEAD
     namespace: "kube-system"
     syncWave: "0"
+
+  kube-prometheus-stack:
+    chart: kube-prometheus-stack
+    repoURL: oci://ghcr.io/prometheus-community/charts/kube-prometheus-stack
+    targetRevision: 84.0.1
+    namespace: monitoring
+    syncWave: "1"
