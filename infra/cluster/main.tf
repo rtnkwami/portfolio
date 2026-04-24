@@ -8,6 +8,10 @@ module "vpc" {
   private_subnets = [for index, value in local.azs : cidrsubnet(var.vpc_cidr, 4, index)]
   public_subnets  = [for index, value in local.azs : cidrsubnet(var.vpc_cidr, 8, index + 112)]
 
+  private_subnet_tags = {
+    "karpenter.sh/discovery" = var.project_name
+  }
+
   enable_dns_hostnames = true
   enable_dns_support   = true
 
@@ -137,6 +141,10 @@ module "eks_managed_node_group" {
       value  = "true"
       effect = "NO_SCHEDULE"
     },
+  }
+
+  labels = {
+    "karpenter.sh/controller" = "true"
   }
 
   update_config = {

@@ -13,9 +13,11 @@ system:
     chart: kube-system
     repoURL: oci://public.ecr.aws/karpenter/karpenter
     targetRevision: 1.11.1
-    namespace: karpenter
+    namespace: kube-system
     syncWave: "2"
     values:
       settings:
         clusterName: portfolio-eks-cluster
         interruptionQueue: KarpenterInterruptionQueue-portfolio-eks-cluster
+      serviceAccount:
+        name: "karpenter"
