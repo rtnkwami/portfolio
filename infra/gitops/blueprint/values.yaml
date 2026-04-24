@@ -1,0 +1,17 @@
+globals:
+  destinationServer: https://kubernetes.default.svc
+
+system:
+  karpenter-crd:
+    chart: karpenter
+    repoURL: oci://public.ecr.aws/karpenter/karpenter-crd
+    targetRevision: 1.11.1
+    namespace: kube-system
+    syncWave: "1"
+  
+  karpenter:
+    chart: kube-system
+    repoURL: oci://public.ecr.aws/karpenter/karpenter
+    targetRevision: 1.11.1
+    namespace: karpenter
+    syncWave: "2"
