@@ -7,7 +7,7 @@ metadata:
   namespace: argocd
   {{- if $component.syncWave  }}
   annotations:
-    argocd.argoproj.io/sync-wave: {{ $component.syncWave }}
+    argocd.argoproj.io/sync-wave: {{ $component.syncWave | toString }}
   {{- end  }}
   finalizers:
     - resources-finalizer.argocd.argoproj.io
