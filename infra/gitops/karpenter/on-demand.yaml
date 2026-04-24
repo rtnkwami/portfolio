@@ -26,5 +26,6 @@ spec:
           effect: NoSchedule
   disruption:
     consolidationPolicy: WhenEmptyOrUnderutilized
+    consolidateAfter: 1m
     budgets:
       - nodes: 10%
