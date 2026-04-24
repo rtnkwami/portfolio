@@ -14,9 +14,15 @@ metadata:
 spec:
   project: {{ $component.project | default "default" }}
   source:
+    {{- if $component.chart }}
     chart: {{ $component.chart }}
     repoURL: {{ $component.repoURL }}
     targetRevision: {{ $component.targetRevision }}
+    {{- else }}
+    repoURL: {{ $component.repoURL }}
+    path: {{ $component.path }}
+    targetRevision: {{ $component.targetRevision }}
+    {{- end }}
     {{- if $component.values }}
     helm:
       valuesObject:

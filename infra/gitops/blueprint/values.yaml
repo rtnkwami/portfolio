@@ -22,3 +22,10 @@ system:
         interruptionQueue: KarpenterInterruptionQueue-portfolio-eks-cluster
       serviceAccount:
         name: "karpenter"
+
+  karpenter-config:
+    repoURL: https://github.com/rtnkwami/portfolio.git
+    path: infra/gitops/karpenter
+    targetRevision: HEAD
+    namespace: "kube-system"
+    syncWave: "0"
