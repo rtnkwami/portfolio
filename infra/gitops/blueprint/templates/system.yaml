@@ -1,0 +1,36 @@
+{{- range $name, $component := .Values.system  }}
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: {{ $name }}
+  namespace: argocd
+  {{- if $component.syncWave  }}
+  annotations:
+    argocd.argoproj.io/sync-wave: {{ $component.syncWave }}
+  {{- end  }}
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: {{ $component.project | default "default" }}
+  source:
+    chart: {{ $component.chart }}
+    repoURL: {{ $component.repoURL }}
+    targetRevision: {{ $component.targetRevision }}
+    {{- if $component.values }}
+    helm:
+      valuesObject:
+        {{- toYaml $component.values | nindent 8 }}
+    {{- end }}
+  destination:
+    namespace: {{ $component.namespace | default $name }}
+    server: {{ $.Values.globals.destinationServer }}
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
+{{- end  }}
+---
