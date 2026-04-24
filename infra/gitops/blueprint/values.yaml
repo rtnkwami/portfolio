@@ -15,3 +15,7 @@ system:
     targetRevision: 1.11.1
     namespace: karpenter
     syncWave: "2"
+    values:
+      settings:
+        clusterName: portfolio-eks-cluster
+        interruptionQueue: KarpenterInterruptionQueue-portfolio-eks-cluster

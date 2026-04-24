@@ -184,3 +184,19 @@ resource "helm_release" "argocd" {
   # depends_on coredns ensures the addon is present before ArgoCD pods attempt to schedule.
   depends_on = [ aws_eks_addon.coredns ]
 }
+
+module "karpenter" {
+  source = "terraform-aws-modules/eks/aws//modules/karpenter"
+  version = "21.18.0"
+
+  cluster_name = module.eks.cluster_name
+  
+  # role nodes need to use to be authorized to join eks cluster
+  node_iam_role_name = "KarpenterNodeRole-${module.eks.cluster_name}"
+  # refuse prefix auto-append to make reference in karpenter crds easier
+  node_iam_role_use_name_prefix = false
+  enable_spot_termination = true
+  queue_name = "KarpenterInterruptionQueue-${module.eks.cluster_name}"
+
+  depends_on = [ aws_eks_addon.coredns ]
+}
