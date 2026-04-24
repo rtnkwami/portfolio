@@ -42,47 +42,13 @@ module "eks" {
   vpc_id     = module.vpc.vpc_id
   subnet_ids = module.vpc.private_subnets
 
-  # CNI pods need nodes to be scheduled to. These are the base nodes. Karpenter handles the rest
-  eks_managed_node_groups = {
-    system_nodes = {
-      ami_type       = "AL2023_ARM_64_STANDARD" # required for graviton instances
-      instance_types = ["t4g.medium"]           # cheaper for lab
-      capacity_type  = "SPOT"                   # cheaper for lab
-      min_size       = 1
-      max_size       = 3
-      desired_size   = 2
-
-      iam_role_attach_cni_policy            = false
-      attach_cluster_primary_security_group = true
-
-      # Prevent any other pods from being scheduled to nodes in this group
-      taints = {
-        critical_addons = {
-          key    = "CriticalAddonsOnly"
-          value  = "true"
-          effect = "NO_SCHEDULE"
-        }
-      }
-
-      update_config = {
-        max_unavailable = 1
-      }
-
-      tags = {
-        Name             = "${var.project_name}-eks-system-node-pool"
-        Project          = var.project_name
-        ResourceCategory = "Compute"
-      }
-    }
-  }
-
   addons = {
-    coredns = {}
+    # eks-pod-identity-agent must be installed before compute (before_compute = true)
+    # because it needs to be present on nodes when they join.
+    # vpc-cni and kube-proxy are intentionally omitted; Cilium replaces both of them.
+    # coredns is intentionally omitted here — it requires nodes to be Ready before
+    # it can schedule, so it is managed separately after the node group is created.
     eks-pod-identity-agent = {
-      before_compute = true
-    }
-    kube-proxy = {} # needed for argocd to be deployed before being replaced with cilium
-    vpc-cni = {
       before_compute = true
     }
   }
@@ -95,27 +61,126 @@ module "eks" {
   }
 }
 
-module "vpc_cni_eks_pod_identity_ipv4" {
-  source  = "terraform-aws-modules/eks-pod-identity/aws"
-  version = "2.7.0"
+resource "helm_release" "cilium" {
+  name = "cilium"
+  namespace = "kube-system"
+  repository = "oci://quay.io/cilium/charts"
+  chart = "cilium"
+  version = "1.19.3"
+  # wait=false is intentional. Cilium pods cannot become Ready until nodes exist,
+  # but nodes depend on Cilium manifests being present. Setting wait=false breaks
+  # this deadlock — manifests are applied to the API server immediately, and Cilium
+  # becomes Ready naturally once the node group is created.
+  wait = false
 
-  name = "${var.project_name}-eks-vpc-cni-ipv4"
+  values = [
+    yamlencode({
+      operator = {
+        # The Cilium operator is a Deployment, not a DaemonSet.
+        # Unlike DaemonSets, Deployments do not automatically tolerate node taints.
+        # Without this toleration, the operator cannot schedule on the tainted nodes,
+        # which means Cilium never initializes, network-unavailable taint is never
+        # removed, and coredns stays pending forever.
+        tolerations = [{
+          key = "CriticalAddonsOnly"
+          operator = "Equal"
+          value = "true"
+          effect = "NoSchedule"
+        }]
+      }
+      eni = { enabled = true }
+      ipam = { mode = "eni" }
+      egressMasqueradeInterfaces = "eth0"
+      routingMode = "native"
+      kubeProxyReplacement = "true"
+      k8sServiceHost = replace(module.eks.cluster_endpoint, "https://", "")
+      k8sServicePort = "443"
+    })
+  ]
+}
 
-  attach_aws_vpc_cni_policy = true
-  aws_vpc_cni_enable_ipv4   = true
+module "eks_managed_node_group" {
+  source = "terraform-aws-modules/eks/aws//modules/eks-managed-node-group"
+  version = "21.18.0"
 
-  associations = {
-    vpc_cni = {
-      cluster_name    = module.eks.cluster_name
-      namespace       = "kube-system"
-      service_account = "aws-node"
-    }
+  name = "system-nodes"
+  cluster_name = module.eks.cluster_name
+  cluster_service_cidr = module.eks.cluster_service_cidr
+  cluster_endpoint = module.eks.cluster_endpoint
+  cluster_auth_base64 = module.eks.cluster_certificate_authority_data
+
+  subnet_ids = module.vpc.private_subnets
+
+  cluster_primary_security_group_id = module.eks.cluster_primary_security_group_id
+  vpc_security_group_ids = [module.eks.node_security_group_id]
+  
+  iam_role_additional_policies = {
+    cilium_eni = data.aws_iam_policy.cni_policy.arn
+    worker_node = data.aws_iam_policy.worker_node_policy.arn
+    image_pull_only = data.aws_iam_policy.ecr_pull_only_policy.arn
   }
 
-  tags = {
-    Name         = "${var.project_name}-eks-vpc-cni-addon"
-    Project      = var.project_name
-    ResourceType = "Compute"
-    ManagedBy    = "OpenTofu"
+  min_size = 1
+  desired_size = 2
+  max_size = 3
+
+  instance_types = ["t4g.medium"]
+  ami_type = "AL2023_ARM_64_STANDARD"
+  capacity_type = "SPOT"
+
+  # CriticalAddonsOnly taint prevents workload pods from scheduling on these nodes.
+  # Only pods that explicitly tolerate this taint (Cilium operator, ArgoCD, coredns)
+  # will be allowed to run here.
+  taints = {
+    critical_addons = {
+      key    = "CriticalAddonsOnly"
+      value  = "true"
+      effect = "NO_SCHEDULE"
+    },
   }
+
+  update_config = {
+    max_unavailable = 1
+  }
+  # Node group must wait for Cilium manifests to be applied to the API server.
+  # When nodes join, the Cilium DaemonSet (which tolerates all taints) schedules
+  # immediately, initializes the network, and removes the network-unavailable taint.
+  depends_on = [ helm_release.cilium ]
+}
+
+resource "aws_eks_addon" "coredns" {
+  cluster_name = module.eks.cluster_name
+  addon_name = "coredns"
+  resolve_conflicts_on_update = "PRESERVE"
+
+  # coredns requires Ready nodes with a functioning CNI to schedule.
+  # It is intentionally managed outside the eks module to ensure it is only
+  # created after the node group is Ready and Cilium has initialized the network.
+  depends_on = [ module.eks_managed_node_group ]
+}
+
+resource "helm_release" "argocd" {
+  name = "argocd"
+  namespace = "argocd"
+  create_namespace = true
+  repository = "oci://ghcr.io/argoproj/argo-helm"
+  chart = "argo-cd"
+  version = "9.5.4"
+  values = [
+    yamlencode({
+      global = {
+        # CriticalAddonsOnly toleration required because all nodes carry this taint.
+        tolerations = [
+          {
+            key      = "CriticalAddonsOnly"
+            operator = "Equal"
+            value    = "true"
+            effect   = "NoSchedule"
+          }
+        ]
+      }
+    })
+  ]
+  # depends_on coredns ensures the addon is present before ArgoCD pods attempt to schedule.
+  depends_on = [ aws_eks_addon.coredns ]
 }
