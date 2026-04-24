@@ -1,5 +1,6 @@
 globals:
   destinationServer: https://kubernetes.default.svc
+  clusterName: portfolio-eks-cluster
 
 system:
   karpenter-crd:
