@@ -7,7 +7,7 @@ projects:
   atelier/frontend: "apps/atelier/frontend"
   atelier/contracts: "packages/atelier/contracts"
 
-  eks: infra/cluster
+  eks: k8s/cluster
   scripts: scripts
 
 vcs:

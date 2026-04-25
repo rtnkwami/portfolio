@@ -25,7 +25,7 @@ system:
 
   karpenter-config:
     repoURL: https://github.com/rtnkwami/portfolio.git
-    path: infra/gitops/karpenter
+    path: k8s/gitops/karpenter
     targetRevision: HEAD
     namespace: "kube-system"
     syncWave: "0"

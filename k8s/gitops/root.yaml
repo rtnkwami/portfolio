@@ -7,7 +7,7 @@ spec:
   source:
     repoURL: https://github.com/rtnkwami/portfolio.git
     targetRevision: HEAD
-    path: infra/gitops/blueprint
+    path: k8s/gitops/blueprint
   destination:
     server: https://kubernetes.default.svc
     namespace: argocd
