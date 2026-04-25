@@ -3,14 +3,6 @@ globals:
   clusterName: portfolio-eks-cluster
 
 system:
-
-  argocd:
-    chart: argo-cd
-    repoURL: oci://ghcr.io/argoproj/argo-helm
-    targetRevision: 9.5.4
-    namespace: argocd
-    syncWave: "-3"
-
   karpenter-crd:
     chart: karpenter
     repoURL: oci://public.ecr.aws/karpenter/karpenter-crd
