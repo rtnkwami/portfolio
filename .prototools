@@ -1,0 +1,2 @@
+[plugins.tools]
+node = "https://github.com/moonrepo/node-plugin/releases/latest/download/node_plugin.wasm"
