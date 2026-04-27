@@ -16,10 +16,12 @@ jobs:
       - uses: actions/checkout@v6
         with:
           fetch-depth: 0
+      - uses: actions/setup-node@v6
+        with:
+          cache: pnpm
       - uses: moonrepo/setup-toolchain@v0
         with:
           auto-install: true
-          auto-setup: true
       - run: moon ci :test :lint
       
         
