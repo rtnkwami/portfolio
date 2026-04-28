@@ -22,6 +22,11 @@ dependsOn:
 
 tasks:
   build:
-    command: 'nest build'
+    deps:
+      - '^:build'
+  test:
+    deps:
+      - '^:build'
+  lint:
     deps:
       - '^:build'
