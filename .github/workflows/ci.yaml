@@ -7,8 +7,7 @@ on:
       - main
 
 jobs:
-  lint-and-test:
-    name: Lint and Test
+  validate:
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -19,9 +18,4 @@ jobs:
       - uses: moonrepo/setup-toolchain@v0
         with:
           auto-install: true
-      - uses: actions/cache@v5
-        with:
-          path: .moon/cache
-          key: ${{ runner.os }}-moon-${{ github.sha }}
-          restore-keys: ${{ runner.os }}-moon-
       - run: moon ci :test :lint --base main
