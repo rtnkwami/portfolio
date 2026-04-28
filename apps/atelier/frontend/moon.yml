@@ -1,0 +1,7 @@
+dependsOn:
+  - atelier/contracts
+
+tasks:
+  build:
+    deps:
+      - '^:build'
