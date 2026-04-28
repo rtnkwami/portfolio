@@ -24,7 +24,4 @@ jobs:
           path: .moon/cache
           key: ${{ runner.os }}-moon-${{ github.sha }}
           restore-keys: ${{ runner.os }}-moon-
-      - run: moon ci :test :lint
-      
-        
-      
+      - run: moon ci :test :lint --base main
