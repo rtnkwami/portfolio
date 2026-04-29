@@ -2,6 +2,12 @@
 AWSTemplateFormatVersion: 2010-09-09
 Description: Use CloudFormation to create the S3 bucket to store the terraform state for EKS
 
+Parameters:
+  GitHubRepository:
+    Type: String
+    Description: Repository should be of type org/repo
+    Default: rtnkwami/portfolio
+
 Resources:
   TerraformStateBucket:
     Type: AWS::S3::Bucket
@@ -9,8 +15,37 @@ Resources:
       BucketName: niovial-portfolio-tf-state
       VersioningConfiguration:
         Status: Enabled
+    
+  GHActionsProvider:
+    Type: AWS::IAM::OIDCProvider
+    Properties:
+      Url: "https://token.actions.githubusercontent.com"
+      ClientIdList:
+        - "sts.amazonaws.com"
+
+  PortfolioCIRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action: "sts:AssumeRoleWithWebIdentity"
+            Principal:
+              Federated: !GetAtt GHActionsProvider.Arn
+            Condition:
+              StringEquals:
+                "token.actions.githubusercontent.com:aud": "sts.amazonaws.com"
+                "token.actions.githubusercontent.com:repository": !Sub "${GitHubRepository}"
+                "token.actions.githubusercontent.com:ref": "refs/heads/main"
+              StringLike:
+                "token.actions.githubusercontent.com:sub": !Sub "repo:${GitHubRepository}:*"
+      ManagedPolicyArns:
+        - !Sub arn:${AWS::Partition}:iam::aws:policy/AdministratorAccess
 
 Outputs:
   TfStateBucketName:
     Value: !Ref TerraformStateBucket
+  PortfolioCIRoleArn:
+    Value: !GetAtt PortfolioCIRole.Arn
     
