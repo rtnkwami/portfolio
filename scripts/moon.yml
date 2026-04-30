@@ -11,6 +11,6 @@ project:
 tasks:
   detect-changes:
     description: Detects which projects have been affected by changes in the repo.
-    command: go run detect-changes.go
+    command: uv run detect-changes.py
     options:
       cache: false
