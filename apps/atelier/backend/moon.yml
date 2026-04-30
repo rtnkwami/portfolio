@@ -13,7 +13,9 @@ project:
   maintainers:
     - Robert Kwami
 
-tags: [Atelier, Backend]
+tags:
+  - atelier
+  - containerized
 
 stack: backend
 
