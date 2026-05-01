@@ -12,5 +12,6 @@ tasks:
   detect-changes:
     description: Detects which projects have been affected by changes in the repo.
     command: uv run detect-changes.py
+    toolchain: "uv"
     options:
       cache: false
