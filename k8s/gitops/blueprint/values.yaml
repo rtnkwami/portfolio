@@ -87,6 +87,9 @@ system:
               operator: Equal
               value: observability
               effect: NoSchedule
+          resources:
+            requests:
+              memory: 500Mi
           nodeSelector:
             niovial.com/workload: observability
       grafana:
@@ -97,6 +100,9 @@ system:
             effect: NoSchedule
         nodeSelector:
           niovial.com/workload: observability
+        resources:
+          requests:
+            memory: 600Mi
       kube-state-metrics:
         tolerations:
           - key: niovial.com/workload
