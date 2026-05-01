@@ -108,6 +108,7 @@ resource "helm_release" "cilium" {
           }]
         }
       }
+      gatewayAPI = { enabled = true }
       eni = { enabled = true }
       ipam = { mode = "eni" }
       egressMasqueradeInterfaces = "eth0"
