@@ -30,7 +30,7 @@ system:
     namespace: "kube-system"
     syncWave: "0"
   
-  gatewayAPI-crds:
+  gateway-api-crds:
     repoURL: https://github.com/kubernetes-sigs/gateway-api
     path: config/crd/experimental
     targetRevision: v1.5.1
