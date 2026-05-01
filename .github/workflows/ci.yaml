@@ -37,7 +37,7 @@ jobs:
           auto-install: true
       
       - id: changes
-        run: echo changes=$(moon run scripts:detect-changes) >> $GITHUB_OUTPUT
+        run: echo changes=$(moon run scripts:detect-changes -q) >> $GITHUB_OUTPUT
 
   containerize:
     needs: detect-changes

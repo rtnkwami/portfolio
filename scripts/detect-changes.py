@@ -2,11 +2,10 @@ import subprocess
 import json
 from pathlib import Path
 from os import environ
-import sys
 
 def find_affected_projects():
     query = subprocess.run(
-        ["moon", "query", "affected", "-q", "--downstream", "deep"],
+        ["moon", "query", "affected", "--downstream", "deep"],
         capture_output = True
     )
     results = json.loads(query.stdout)
