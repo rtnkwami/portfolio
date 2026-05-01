@@ -16,6 +16,27 @@ Resources:
       VersioningConfiguration:
         Status: Enabled
     
+  PortfolioEcrRepo:
+    Type: AWS::ECR::PublicRepository
+    Properties:
+      RepositoryName: portfolio
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+
+  AtelierBackendEcrRepo:
+    Type: AWS::ECR::PublicRepository
+    Properties:
+      RepositoryName: atelier-backend
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+
+  AtelierFrontendEcrRepo:
+    Type: AWS::ECR::PublicRepository
+    Properties:
+      RepositoryName: atelier-frontend
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+  
   GHActionsProvider:
     Type: AWS::IAM::OIDCProvider
     Properties:
