@@ -10,7 +10,7 @@ export const envSchema = z.object({
 
 export function envValidate(envVariables: Record<string, unknown>) {
   const result = envSchema.safeParse(envVariables);
-
+  //
   if (result.error) {
     const errors = z.flattenError(result.error);
     throw new Error(JSON.stringify(errors.fieldErrors, null, 2));
