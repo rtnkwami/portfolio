@@ -40,7 +40,8 @@ jobs:
         run: echo changes=$(moon run scripts:detect-changes -q) >> $GITHUB_OUTPUT
 
   containerize:
-    needs: detect-changes
+    needs: [detect-changes, validate]
+    if: ${{ needs.detect-changes.outputs.changes != '[]' }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
