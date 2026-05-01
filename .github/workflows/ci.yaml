@@ -19,3 +19,64 @@ jobs:
         with:
           auto-install: true
       - run: moon ci :test :lint --base main
+
+  detect-changes:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      changes: ${{ steps.changes.outputs.changes }}
+    
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      
+      - uses: moonrepo/setup-toolchain@v0
+        with:
+          auto-install: true
+      
+      - id: changes
+        run: echo changes=$(moon run scripts:detect-changes) >> $GITHUB_OUTPUT
+
+  containerize:
+    needs: detect-changes
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    strategy:
+      matrix:
+        app: ${{ fromJson(needs.detect-changes.outputs.changes) }}
+    
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      
+      # - uses: aws-actions/configure-aws-credentials@v4
+      #   with:
+      #     role-to-assume: ${{ vars.CI_ROLE_ARN }}
+      #     aws-region: us-east-1
+      
+      # - id: ecr-login
+      #   uses: aws-actions/amazon-ecr-login@v2
+      #   with:
+      #     registry-type: public
+      
+      # - uses: docker/setup-buildx-action@v4
+      
+      # - id: image
+      #   run: echo "name=$(echo '${{ matrix.app }}' | tr '/' '-')" >> $GITHUB_OUTPUT
+      
+      # - uses: docker/build-push-action@v7
+      #   env:
+      #     REGISTRY: ${{ steps.ecr-login.outputs.registry }}
+      #     REGISTRY_ALIAS: niovial
+      #     REPOSITORY: portfolio
+      #     IMAGE_TAG: ${{ github.sha }}
+      #   with:
+      #     push: true
+      #     context: .
+      #     file: apps/${{ matrix.app }}/Dockerfile
+      #     tags: ${{ env.REGISTRY }}/${{ env.REGISTRY_ALIAS }}/${{ env.REPOSITORY }}:${{ env.IMAGE_TAG }}
