@@ -34,7 +34,7 @@ system:
     chart: kube-prometheus-stack
     repoURL: oci://ghcr.io/prometheus-community/charts/kube-prometheus-stack
     targetRevision: 84.0.1
-    namespace: observability
+    namespace: monitoring
     syncWave: "1"
     values:
       crds:
