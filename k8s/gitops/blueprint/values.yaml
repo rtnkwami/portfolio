@@ -42,7 +42,7 @@ system:
           tolerations:
             - key: niovial.com/workload
               operator: Equal
-              value: monitoring
+              value: observability
               effect: NoSchedule
           nodeSelector:
             niovial.com/workload: monitoring
@@ -51,7 +51,7 @@ system:
           tolerations:
             - key: niovial.com/workload
               operator: Equal
-              value: monitoring
+              value: observability
               effect: NoSchedule
           nodeSelector:
             niovial.com/workload: monitoring
@@ -59,7 +59,7 @@ system:
         tolerations:
           - key: niovial.com/workload
             operator: Equal
-            value: monitoring
+            value: observability
             effect: NoSchedule
         nodeSelector:
           niovial.com/workload: monitoring
@@ -68,7 +68,7 @@ system:
             tolerations:
               - key: niovial.com/workload
                 operator: Equal
-                value: monitoring
+                value: observability
                 effect: NoSchedule
             nodeSelector:
               niovial.com/workload: monitoring
@@ -76,7 +76,7 @@ system:
             tolerations:
               - key: niovial.com/workload
                 operator: Equal
-                value: monitoring
+                value: observability
                 effect: NoSchedule
             nodeSelector:
               niovial.com/workload: monitoring
@@ -85,7 +85,15 @@ system:
           tolerations:
             - key: niovial.com/workload
               operator: Equal
-              value: monitoring
+              value: observability
               effect: NoSchedule
           nodeSelector:
             niovial.com/workload: monitoring
+      grafana:
+        tolerations:
+          - key: niovial.com/workload
+            operator: Equal
+            value: observability
+            effect: NoSchedule
+        nodeSelector:
+          niovial.com/workload: monitoring

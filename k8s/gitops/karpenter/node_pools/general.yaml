@@ -7,7 +7,9 @@ spec:
   template:
     metadata:
       labels:
-        niovial.com/workload: general
+        node-role.kubernetes.io/general-purpose: general-purpose
+        app.kubernetes.io/managed-by: karpenter
+        niovial.com/workload: general-purpose
     spec:
       nodeClassRef:
         group: karpenter.k8s.aws
@@ -45,7 +47,9 @@ spec:
   template:
     metadata:
       labels:
-        niovial.com/workload: general
+        node-role.kubernetes.io/general-purpose: general-purpose
+        app.kubernetes.io/managed-by: karpenter
+        niovial.com/workload: general-purpose
     spec:
       nodeClassRef:
         group: karpenter.k8s.aws
