@@ -34,7 +34,7 @@ system:
     chart: kube-prometheus-stack
     repoURL: oci://ghcr.io/prometheus-community/charts/kube-prometheus-stack
     targetRevision: 84.0.1
-    namespace: monitoring
+    namespace: observability
     syncWave: "1"
     values:
       crds:
@@ -45,7 +45,7 @@ system:
               value: observability
               effect: NoSchedule
           nodeSelector:
-            niovial.com/workload: monitoring
+            niovial.com/workload: observability
       alertmanager:
         alertmanagerSpec:
           tolerations:
@@ -54,7 +54,7 @@ system:
               value: observability
               effect: NoSchedule
           nodeSelector:
-            niovial.com/workload: monitoring
+            niovial.com/workload: observability
       prometheusOperator:
         tolerations:
           - key: niovial.com/workload
@@ -62,7 +62,7 @@ system:
             value: observability
             effect: NoSchedule
         nodeSelector:
-          niovial.com/workload: monitoring
+          niovial.com/workload: observability
         admissionWebhooks:
           deployment:
             tolerations:
@@ -71,7 +71,7 @@ system:
                 value: observability
                 effect: NoSchedule
             nodeSelector:
-              niovial.com/workload: monitoring
+              niovial.com/workload: observability
           patch:
             tolerations:
               - key: niovial.com/workload
@@ -79,7 +79,7 @@ system:
                 value: observability
                 effect: NoSchedule
             nodeSelector:
-              niovial.com/workload: monitoring
+              niovial.com/workload: observability
       prometheus:
         prometheusSpec:
           tolerations:
@@ -88,7 +88,7 @@ system:
               value: observability
               effect: NoSchedule
           nodeSelector:
-            niovial.com/workload: monitoring
+            niovial.com/workload: observability
       grafana:
         tolerations:
           - key: niovial.com/workload
@@ -96,4 +96,12 @@ system:
             value: observability
             effect: NoSchedule
         nodeSelector:
-          niovial.com/workload: monitoring
+          niovial.com/workload: observability
+      kube-state-metrics:
+        tolerations:
+          - key: niovial.com/workload
+            operator: Equal
+            value: observability
+            effect: NoSchedule
+        nodeSelector:
+          niovial.com/workload: observability
