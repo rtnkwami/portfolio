@@ -12,7 +12,7 @@ def find_affected_projects():
     results = json.loads(query.stdout)
 
     if results == {}:
-        sys.exit(1)
+        return []
     
     affected: list[str] = []
     for project, _ in results["projects"].items():
