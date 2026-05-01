@@ -96,6 +96,18 @@ resource "helm_release" "cilium" {
           effect = "NoSchedule"
         }]
       }
+      hubble = {
+        relay = {
+          enabled = true
+          rollOutPods = true
+          tolerations = [{
+            key      = "niovial.com/workload"
+            operator = "Equal"
+            value    = "observability"
+            effect   = "NoSchedule"
+          }]
+        }
+      }
       eni = { enabled = true }
       ipam = { mode = "eni" }
       egressMasqueradeInterfaces = "eth0"
