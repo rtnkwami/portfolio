@@ -82,8 +82,8 @@ jobs:
       - uses: docker/build-push-action@v7
         env:
           REGISTRY: ${{ steps.ecr-login.outputs.registry }}
-          REGISTRY_ALIAS: niovial
-          REPOSITORY: portfolio
+          REGISTRY_ALIAS: h6w5n3z2
+          REPOSITORY: ${{ steps.image.outputs.name }}
           IMAGE_TAG: ${{ github.sha }}
         with:
           push: true
