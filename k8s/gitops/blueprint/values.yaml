@@ -36,3 +36,56 @@ system:
     targetRevision: 84.0.1
     namespace: monitoring
     syncWave: "1"
+    values:
+      crds:
+        upgradeJob:
+          tolerations:
+            - key: niovial.com/workload
+              operator: Equal
+              value: monitoring
+              effect: NoSchedule
+          nodeSelector:
+            niovial.com/workload: monitoring
+      alertmanager:
+        alertmanagerSpec:
+          tolerations:
+            - key: niovial.com/workload
+              operator: Equal
+              value: monitoring
+              effect: NoSchedule
+          nodeSelector:
+            niovial.com/workload: monitoring
+      prometheusOperator:
+        tolerations:
+          - key: niovial.com/workload
+            operator: Equal
+            value: monitoring
+            effect: NoSchedule
+        nodeSelector:
+          niovial.com/workload: monitoring
+        admissionWebhooks:
+          deployment:
+            tolerations:
+              - key: niovial.com/workload
+                operator: Equal
+                value: monitoring
+                effect: NoSchedule
+            nodeSelector:
+              niovial.com/workload: monitoring
+          patch:
+            tolerations:
+              - key: niovial.com/workload
+                operator: Equal
+                value: monitoring
+                effect: NoSchedule
+            nodeSelector:
+              niovial.com/workload: monitoring
+      prometheus:
+        prometheusSpec:
+          tolerations:
+            - key: niovial.com/workload
+              operator: Equal
+              value: monitoring
+              effect: NoSchedule
+          nodeSelector:
+            niovial.com/workload: monitoring
