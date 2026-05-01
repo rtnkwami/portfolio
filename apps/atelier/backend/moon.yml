@@ -24,11 +24,16 @@ dependsOn:
 
 tasks:
   build:
+    command: 'pnpm build'
     deps:
       - '^:build'
+    outputs:
+      - 'dist/**/*'
   test:
+    command: 'pnpm test'
     deps:
       - '^:build'
   lint:
+    command: 'pnpm lint'
     deps:
       - '^:build'
