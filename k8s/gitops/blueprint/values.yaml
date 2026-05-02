@@ -9,6 +9,13 @@ system:
     targetRevision: 1.11.1
     namespace: kube-system
     syncWave: "-2"
+
+  gateway-api-crds:
+    repoURL: https://github.com/kubernetes-sigs/gateway-api
+    path: config/crd/experimental
+    targetRevision: v1.5.1
+    namespace: "kube-system"
+    syncWave: "-2"
   
   karpenter:
     chart: karpenter
@@ -27,13 +34,6 @@ system:
     repoURL: https://github.com/rtnkwami/portfolio.git
     path: k8s/gitops/karpenter
     targetRevision: HEAD
-    namespace: "kube-system"
-    syncWave: "0"
-  
-  gateway-api-crds:
-    repoURL: https://github.com/kubernetes-sigs/gateway-api
-    path: config/crd/experimental
-    targetRevision: v1.5.1
     namespace: "kube-system"
     syncWave: "0"
 
