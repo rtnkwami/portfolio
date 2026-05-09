@@ -4,7 +4,7 @@ run-name: "CI Run for change: ${{ github.event.head_commit.message }}"
 on:
   push:
     branches:
-      - main
+      - '**'
 
 jobs:
   validate:
@@ -41,7 +41,7 @@ jobs:
 
   containerize:
     needs: [detect-changes, validate]
-    if: ${{ needs.detect-changes.outputs.changes != '[]' }}
+    if: ${{ github.ref_name == 'main' && needs.detect-changes.outputs.changes != '[]' }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
