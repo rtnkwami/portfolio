@@ -2,7 +2,7 @@
   "name": "@atelier/contracts",
   "version": "1.0.0",
   "description": "",
-  "main": "./dist/index.cjs",
+  "main": "./dist/schema.cjs",
   "scripts": {
     "build": "tsdown"
   },
@@ -18,30 +18,21 @@
   "dependencies": {
     "zod": "^4.3.6"
   },
-  "module": "./dist/index.mjs",
-  "types": "./dist/index.d.cts",
+  "module": "./dist/schema.mjs",
+  "types": "./dist/schema.d.cts",
   "exports": {
-    "./schemas": {
-      "source": "./src/schemas/index.ts",
-      "import": "./dist/schemas/index.mjs",
-      "require": "./dist/schemas/index.cjs"
-    },
-    "./types": {
-      "source": "./src/types/index.ts",
-      "import": "./dist/types/index.mjs",
-      "require": "./dist/types/index.cjs"
+    ".": {
+      "source": "./src/schema.ts",
+      "import": "./dist/schema.mjs",
+      "require": "./dist/schema.cjs"
     },
     "./package.json": "./package.json"
   },
   "publishConfig": {
     "exports": {
-      "./schemas": {
-        "import": "./dist/schemas/index.mjs",
-        "require": "./dist/schemas/index.cjs"
-      },
-      "./types": {
-        "import": "./dist/types/index.mjs",
-        "require": "./dist/types/index.cjs"
+      ".": {
+        "import": "./dist/schema.mjs",
+        "require": "./dist/schema.cjs"
       },
       "./package.json": "./package.json"
     }

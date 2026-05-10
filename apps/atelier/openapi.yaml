@@ -1,0 +1,283 @@
+openapi: 3.0.0
+paths:
+  /:
+    get:
+      operationId: AppController_getHello
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags:
+        - App
+  /inventory/categories:
+    post:
+      operationId: createCategory
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCategoryDto'
+      responses:
+        '201':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoryResponse_Output'
+        '400':
+          description: ''
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/StandardErrorResponseDto'
+                  - $ref: '#/components/schemas/ValidationResponseDto'
+                discriminator:
+                  propertyName: type
+                  mapping:
+                    StandardError: '#/components/schemas/StandardErrorResponseDto'
+                    ValidationError: '#/components/schemas/ValidationResponseDto'
+        '500':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerErrorResponseDto'
+      summary: ''
+      tags:
+        - Inventory
+    get:
+      operationId: getAllCategories
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/getAllCategoriesResponse_Output'
+        '400':
+          description: ''
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/StandardErrorResponseDto'
+                  - $ref: '#/components/schemas/ValidationResponseDto'
+                discriminator:
+                  propertyName: type
+                  mapping:
+                    StandardError: '#/components/schemas/StandardErrorResponseDto'
+                    ValidationError: '#/components/schemas/ValidationResponseDto'
+        '500':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerErrorResponseDto'
+      summary: ''
+      tags:
+        - Inventory
+  /inventory/categories/{id}:
+    get:
+      operationId: getCategory
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            format: uuid
+            pattern: >-
+              ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+            type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoryResponse_Output'
+        '400':
+          description: ''
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/StandardErrorResponseDto'
+                  - $ref: '#/components/schemas/ValidationResponseDto'
+                discriminator:
+                  propertyName: type
+                  mapping:
+                    StandardError: '#/components/schemas/StandardErrorResponseDto'
+                    ValidationError: '#/components/schemas/ValidationResponseDto'
+        '404':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StandardErrorResponseDto'
+        '500':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerErrorResponseDto'
+      summary: ''
+      tags:
+        - Inventory
+    delete:
+      operationId: deleteCategory
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            format: uuid
+            pattern: >-
+              ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+            type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoryResponse_Output'
+        '400':
+          description: ''
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/StandardErrorResponseDto'
+                  - $ref: '#/components/schemas/ValidationResponseDto'
+                discriminator:
+                  propertyName: type
+                  mapping:
+                    StandardError: '#/components/schemas/StandardErrorResponseDto'
+                    ValidationError: '#/components/schemas/ValidationResponseDto'
+        '404':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StandardErrorResponseDto'
+        '500':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerErrorResponseDto'
+      summary: ''
+      tags:
+        - Inventory
+info:
+  title: Atelier Main API
+  description: ''
+  version: '1.0'
+  contact: {}
+tags: []
+servers: []
+components:
+  schemas:
+    InternalServerErrorResponseDto:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - InternalServerError
+          default: InternalServerError
+        statusCode:
+          type: number
+        error:
+          type: string
+      required:
+        - type
+        - statusCode
+        - error
+    CreateCategoryDto:
+      type: object
+      properties:
+        name:
+          type: string
+      required:
+        - name
+    CategoryResponse_Output:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          pattern: >-
+            ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+        name:
+          type: string
+      required:
+        - id
+        - name
+      additionalProperties: false
+    getAllCategoriesResponse_Output:
+      type: object
+      properties:
+        categories:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                format: uuid
+                pattern: >-
+                  ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+              name:
+                type: string
+            required:
+              - id
+              - name
+            additionalProperties: false
+      required:
+        - categories
+      additionalProperties: false
+    StandardErrorResponseDto:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - StandardError
+          default: StandardError
+        statusCode:
+          type: number
+        error:
+          type: string
+        message:
+          type: string
+      required:
+        - type
+        - statusCode
+        - error
+        - message
+    ValidationResponseDto:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - ValidationError
+          default: ValidationError
+        statusCode:
+          type: number
+        error:
+          type: string
+        errors:
+          type: array
+          items:
+            type: object
+      required:
+        - type
+        - statusCode
+        - error
+        - errors

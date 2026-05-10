@@ -6,7 +6,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { Category } from 'src/database/entities/category.entity';
-import { CreateCategoryDto } from './dto/create-category.dto';
+import { CreateCategoryDto } from './dto/requests.dto';
 
 @Injectable()
 export class InventoryService {
@@ -26,7 +26,7 @@ export class InventoryService {
   public async getCategory(id: string) {
     const category = await this.em.findOne(Category, id);
     if (!category) {
-      throw new NotFoundException(`Category with id ${id} does not exist`);
+      throw new NotFoundException(`category ${id} does not exist`);
     }
     return category;
   }
@@ -38,15 +38,14 @@ export class InventoryService {
     });
 
     if (!category) {
-      throw new NotFoundException(`Category with id ${id} does not exist`);
+      throw new NotFoundException(`category ${id} does not exist`);
     }
 
     const productCount = category.products.count();
     if (productCount > 0) {
-      throw new BadRequestException({
-        error: `category ${category.name} has existing products`,
-        products: productCount,
-      });
+      throw new BadRequestException(
+        `category ${category.name} has existing products`,
+      );
     }
     this.em.remove(category);
     return category;
