@@ -160,6 +160,38 @@ paths:
       summary: ''
       tags:
         - Inventory
+  /inventory/products:
+    post:
+      operationId: createProduct
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateProductParams'
+      responses:
+        '201':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PrivateProduct_Output'
+        '409':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StandardErrorDto'
+        '500':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerErrorDto'
+      summary: ''
+      tags:
+        - Inventory
 info:
   title: Atelier Main API
   description: ''
@@ -242,6 +274,58 @@ components:
         - error
         - statusCode
         - message
+    CreateProductParams:
+      type: object
+      properties:
+        product:
+          type: object
+          properties:
+            name:
+              type: string
+              minLength: 1
+            description:
+              type: string
+            price:
+              type: number
+              exclusiveMinimum: 0
+            stock:
+              type: number
+              exclusiveMinimum: 0
+          required:
+            - name
+            - price
+            - stock
+        category_id:
+          type: string
+          format: uuid
+          pattern: >-
+            ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+      required:
+        - product
+        - category_id
+    PrivateProduct_Output:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+        description:
+          type: string
+        price:
+          type: number
+          exclusiveMinimum: 0
+        category:
+          type: string
+          minLength: 1
+        stock:
+          type: number
+          exclusiveMinimum: 0
+      required:
+        - name
+        - price
+        - category
+        - stock
+      additionalProperties: false
     ValidationErrorDto:
       type: object
       properties:
