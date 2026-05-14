@@ -1,23 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-export class StandardErrorResponseDto {
-  @ApiProperty({ enum: ['StandardError'], default: 'StandardError' })
-  type!: 'StandardError';
-
-  @ApiProperty()
-  statusCode!: number;
-
-  @ApiProperty()
-  error!: string;
-
-  @ApiProperty()
-  message!: string;
-}
-
-export class ValidationResponseDto {
-  @ApiProperty({ enum: ['ValidationError'], default: 'ValidationError' })
-  type!: 'ValidationError';
-
+export class ValidationErrorDto {
   @ApiProperty()
   statusCode!: number;
 
@@ -28,16 +11,21 @@ export class ValidationResponseDto {
   errors!: unknown[];
 }
 
-export class InternalServerErrorResponseDto {
-  @ApiProperty({
-    enum: ['InternalServerError'],
-    default: 'InternalServerError',
-  })
-  type!: 'InternalServerError';
+export class StandardErrorDto {
+  @ApiProperty()
+  error!: string;
 
   @ApiProperty()
   statusCode!: number;
 
   @ApiProperty()
-  error!: string;
+  message!: string;
+}
+
+export class InternalServerErrorDto {
+  @ApiProperty()
+  statusCode!: number;
+
+  @ApiProperty()
+  message!: string;
 }

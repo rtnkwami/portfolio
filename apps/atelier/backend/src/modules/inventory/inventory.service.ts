@@ -1,10 +1,6 @@
 import { Transactional } from '@mikro-orm/decorators/legacy';
 import { EntityManager } from '@mikro-orm/postgresql';
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { Category } from 'src/database/entities/category.entity';
 import { CreateCategoryDto } from './dto/requests.dto';
 
@@ -18,6 +14,20 @@ export class InventoryService {
     return category;
   }
 
+  @Transactional()
+  public async updateCategory(id: string, name: string) {
+    const category = await this.em.findOne(Category, id);
+
+    if (!category) {
+      throw new HttpException(
+        `category ${id} does not exist`,
+        HttpStatus.NOT_FOUND,
+      );
+    }
+    category.name = name;
+    return category;
+  }
+
   public async getAllCategories() {
     const categories = await this.em.findAll(Category, {});
     return categories;
@@ -26,7 +36,10 @@ export class InventoryService {
   public async getCategory(id: string) {
     const category = await this.em.findOne(Category, id);
     if (!category) {
-      throw new NotFoundException(`category ${id} does not exist`);
+      throw new HttpException(
+        `category ${id} does not exist`,
+        HttpStatus.NOT_FOUND,
+      );
     }
     return category;
   }
@@ -38,13 +51,17 @@ export class InventoryService {
     });
 
     if (!category) {
-      throw new NotFoundException(`category ${id} does not exist`);
+      throw new HttpException(
+        `category ${id} does not exist`,
+        HttpStatus.NOT_FOUND,
+      );
     }
-
     const productCount = category.products.count();
+
     if (productCount > 0) {
-      throw new BadRequestException(
+      throw new HttpException(
         `category ${category.name} has existing products`,
+        HttpStatus.CONFLICT,
       );
     }
     this.em.remove(category);

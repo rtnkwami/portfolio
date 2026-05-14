@@ -38,6 +38,7 @@ tasks:
     deps:
       - openapi
   sdk-sync:
+    command: moon run atelier/contracts:build
     deps:
-      - atelier/contracts:build
+      - generate-sdk
   

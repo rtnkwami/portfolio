@@ -21,9 +21,14 @@
     "@angular/router": "^21.2.0",
     "@angular/ssr": "^21.2.7",
     "@atelier/contracts": "workspace:*",
+    "@primeuix/themes": "^2.0.3",
+    "dotenv": "^17.4.2",
     "express": "^5.1.0",
     "openapi-fetch": "^0.17.0",
+    "primeicons": "^7.0.0",
+    "primeng": "^21.1.6",
     "rxjs": "~7.8.0",
+    "tailwindcss-primeui": "^0.6.1",
     "tslib": "^2.3.0"
   },
   "devDependencies": {

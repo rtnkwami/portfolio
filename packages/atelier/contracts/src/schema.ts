@@ -49,21 +49,16 @@ export interface paths {
         delete: operations["deleteCategory"];
         options?: never;
         head?: never;
-        patch?: never;
+        patch: operations["updateCategory"];
         trace?: never;
     };
 }
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
-        InternalServerErrorResponseDto: {
-            /**
-             * @default InternalServerError
-             * @enum {string}
-             */
-            type: "InternalServerError";
+        InternalServerErrorDto: {
             statusCode: number;
-            error: string;
+            message: string;
         };
         CreateCategoryDto: {
             name: string;
@@ -73,6 +68,9 @@ export interface components {
             id: string;
             name: string;
         };
+        UpdateCategoryDto: {
+            name: string;
+        };
         getAllCategoriesResponse_Output: {
             categories: {
                 /** Format: uuid */
@@ -80,22 +78,12 @@ export interface components {
                 name: string;
             }[];
         };
-        StandardErrorResponseDto: {
-            /**
-             * @description discriminator enum property added by openapi-typescript
-             * @enum {string}
-             */
-            type: "StandardError";
-            statusCode: number;
+        StandardErrorDto: {
             error: string;
+            statusCode: number;
             message: string;
         };
-        ValidationResponseDto: {
-            /**
-             * @description discriminator enum property added by openapi-typescript
-             * @enum {string}
-             */
-            type: "ValidationError";
+        ValidationErrorDto: {
             statusCode: number;
             error: string;
             errors: Record<string, never>[];
@@ -143,20 +131,12 @@ export interface operations {
                     "application/json": components["schemas"]["getAllCategoriesResponse_Output"];
                 };
             };
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["StandardErrorResponseDto"] | components["schemas"]["ValidationResponseDto"];
-                };
-            };
             500: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["InternalServerErrorResponseDto"];
+                    "application/json": components["schemas"]["InternalServerErrorDto"];
                 };
             };
         };
@@ -182,20 +162,12 @@ export interface operations {
                     "application/json": components["schemas"]["CategoryResponse_Output"];
                 };
             };
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["StandardErrorResponseDto"] | components["schemas"]["ValidationResponseDto"];
-                };
-            };
             500: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["InternalServerErrorResponseDto"];
+                    "application/json": components["schemas"]["InternalServerErrorDto"];
                 };
             };
         };
@@ -219,20 +191,12 @@ export interface operations {
                     "application/json": components["schemas"]["CategoryResponse_Output"];
                 };
             };
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["StandardErrorResponseDto"] | components["schemas"]["ValidationResponseDto"];
-                };
-            };
             404: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["StandardErrorResponseDto"];
+                    "application/json": components["schemas"]["StandardErrorDto"];
                 };
             };
             500: {
@@ -240,7 +204,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["InternalServerErrorResponseDto"];
+                    "application/json": components["schemas"]["InternalServerErrorDto"];
                 };
             };
         };
@@ -264,20 +228,20 @@ export interface operations {
                     "application/json": components["schemas"]["CategoryResponse_Output"];
                 };
             };
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["StandardErrorResponseDto"] | components["schemas"]["ValidationResponseDto"];
-                };
-            };
             404: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["StandardErrorResponseDto"];
+                    "application/json": components["schemas"]["StandardErrorDto"];
+                };
+            };
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StandardErrorDto"];
                 };
             };
             500: {
@@ -285,7 +249,40 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["InternalServerErrorResponseDto"];
+                    "application/json": components["schemas"]["InternalServerErrorDto"];
+                };
+            };
+        };
+    };
+    updateCategory: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateCategoryDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CategoryResponse_Output"];
+                };
+            };
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InternalServerErrorDto"];
                 };
             };
         };

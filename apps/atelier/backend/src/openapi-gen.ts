@@ -6,9 +6,9 @@ import { writeFileSync } from 'fs';
 import { resolve } from 'path';
 import { dump } from 'js-yaml';
 import {
-  InternalServerErrorResponseDto,
-  StandardErrorResponseDto,
-  ValidationResponseDto,
+  InternalServerErrorDto,
+  ValidationErrorDto,
+  StandardErrorDto,
 } from './modules/shared/errors.dto';
 
 async function openapiGen() {
@@ -23,9 +23,9 @@ async function openapiGen() {
         .build(),
       {
         extraModels: [
-          StandardErrorResponseDto,
-          ValidationResponseDto,
-          InternalServerErrorResponseDto,
+          ValidationErrorDto,
+          InternalServerErrorDto,
+          StandardErrorDto,
         ],
       },
     ),

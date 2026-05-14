@@ -26,25 +26,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CategoryResponse_Output'
-        '400':
-          description: ''
-          content:
-            application/json:
-              schema:
-                oneOf:
-                  - $ref: '#/components/schemas/StandardErrorResponseDto'
-                  - $ref: '#/components/schemas/ValidationResponseDto'
-                discriminator:
-                  propertyName: type
-                  mapping:
-                    StandardError: '#/components/schemas/StandardErrorResponseDto'
-                    ValidationError: '#/components/schemas/ValidationResponseDto'
         '500':
           description: ''
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/InternalServerErrorResponseDto'
+                $ref: '#/components/schemas/InternalServerErrorDto'
       summary: ''
       tags:
         - Inventory
@@ -58,29 +45,49 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/getAllCategoriesResponse_Output'
-        '400':
-          description: ''
-          content:
-            application/json:
-              schema:
-                oneOf:
-                  - $ref: '#/components/schemas/StandardErrorResponseDto'
-                  - $ref: '#/components/schemas/ValidationResponseDto'
-                discriminator:
-                  propertyName: type
-                  mapping:
-                    StandardError: '#/components/schemas/StandardErrorResponseDto'
-                    ValidationError: '#/components/schemas/ValidationResponseDto'
         '500':
           description: ''
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/InternalServerErrorResponseDto'
+                $ref: '#/components/schemas/InternalServerErrorDto'
       summary: ''
       tags:
         - Inventory
   /inventory/categories/{id}:
+    patch:
+      operationId: updateCategory
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            format: uuid
+            pattern: >-
+              ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCategoryDto'
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoryResponse_Output'
+        '500':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerErrorDto'
+      summary: ''
+      tags:
+        - Inventory
     get:
       operationId: getCategory
       parameters:
@@ -99,31 +106,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CategoryResponse_Output'
-        '400':
-          description: ''
-          content:
-            application/json:
-              schema:
-                oneOf:
-                  - $ref: '#/components/schemas/StandardErrorResponseDto'
-                  - $ref: '#/components/schemas/ValidationResponseDto'
-                discriminator:
-                  propertyName: type
-                  mapping:
-                    StandardError: '#/components/schemas/StandardErrorResponseDto'
-                    ValidationError: '#/components/schemas/ValidationResponseDto'
         '404':
           description: ''
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/StandardErrorResponseDto'
+                $ref: '#/components/schemas/StandardErrorDto'
         '500':
           description: ''
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/InternalServerErrorResponseDto'
+                $ref: '#/components/schemas/InternalServerErrorDto'
       summary: ''
       tags:
         - Inventory
@@ -145,31 +139,24 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CategoryResponse_Output'
-        '400':
-          description: ''
-          content:
-            application/json:
-              schema:
-                oneOf:
-                  - $ref: '#/components/schemas/StandardErrorResponseDto'
-                  - $ref: '#/components/schemas/ValidationResponseDto'
-                discriminator:
-                  propertyName: type
-                  mapping:
-                    StandardError: '#/components/schemas/StandardErrorResponseDto'
-                    ValidationError: '#/components/schemas/ValidationResponseDto'
         '404':
           description: ''
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/StandardErrorResponseDto'
+                $ref: '#/components/schemas/StandardErrorDto'
+        '409':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StandardErrorDto'
         '500':
           description: ''
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/InternalServerErrorResponseDto'
+                $ref: '#/components/schemas/InternalServerErrorDto'
       summary: ''
       tags:
         - Inventory
@@ -182,22 +169,16 @@ tags: []
 servers: []
 components:
   schemas:
-    InternalServerErrorResponseDto:
+    InternalServerErrorDto:
       type: object
       properties:
-        type:
-          type: string
-          enum:
-            - InternalServerError
-          default: InternalServerError
         statusCode:
           type: number
-        error:
+        message:
           type: string
       required:
-        - type
         - statusCode
-        - error
+        - message
     CreateCategoryDto:
       type: object
       properties:
@@ -219,6 +200,13 @@ components:
         - id
         - name
       additionalProperties: false
+    UpdateCategoryDto:
+      type: object
+      properties:
+        name:
+          type: string
+      required:
+        - name
     getAllCategoriesResponse_Output:
       type: object
       properties:
@@ -241,33 +229,22 @@ components:
       required:
         - categories
       additionalProperties: false
-    StandardErrorResponseDto:
+    StandardErrorDto:
       type: object
       properties:
-        type:
-          type: string
-          enum:
-            - StandardError
-          default: StandardError
-        statusCode:
-          type: number
         error:
           type: string
+        statusCode:
+          type: number
         message:
           type: string
       required:
-        - type
-        - statusCode
         - error
+        - statusCode
         - message
-    ValidationResponseDto:
+    ValidationErrorDto:
       type: object
       properties:
-        type:
-          type: string
-          enum:
-            - ValidationError
-          default: ValidationError
         statusCode:
           type: number
         error:
@@ -277,7 +254,6 @@ components:
           items:
             type: object
       required:
-        - type
         - statusCode
         - error
         - errors
