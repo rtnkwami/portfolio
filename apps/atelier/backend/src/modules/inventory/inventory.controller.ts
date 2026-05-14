@@ -8,9 +8,13 @@ import {
   Post,
 } from '@nestjs/common';
 import { InventoryService } from './inventory.service';
-import { CreateCategoryDto, UpdateCategoryDto } from './dto/requests.dto';
+import {
+  CreateCategoryDto,
+  CreateProductParams,
+  UpdateCategoryDto,
+} from './dto/requests.dto';
 import { CategoryParams } from './dto/requests.dto';
-import { CategoryResponse } from './dto/responses.dto';
+import { CategoryResponse, PrivateProduct } from './dto/responses.dto';
 import { getAllCategoriesResponse } from './dto/responses.dto';
 import { ApiEndpoint, ApiErrorResponses } from '../shared/openapi.decorator';
 
@@ -78,4 +82,15 @@ export class InventoryController {
   }
 
   // --- PRODUCT ENDPOINTS ---
+
+  @ApiEndpoint({
+    operationId: 'createProduct',
+    status: 201,
+    type: PrivateProduct,
+  })
+  @ApiErrorResponses('Conflict')
+  @Post('products')
+  public async createProduct(@Body() data: CreateProductParams) {
+    return this.inventoryService.createProduct(data);
+  }
 }

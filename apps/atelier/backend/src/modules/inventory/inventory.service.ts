@@ -2,7 +2,8 @@ import { Transactional } from '@mikro-orm/decorators/legacy';
 import { EntityManager } from '@mikro-orm/postgresql';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { Category } from 'src/database/entities/category.entity';
-import { CreateCategoryDto } from './dto/requests.dto';
+import { CreateCategoryDto, CreateProductParams } from './dto/requests.dto';
+import { Product } from 'src/database/entities/product.entity';
 
 @Injectable()
 export class InventoryService {
@@ -66,5 +67,23 @@ export class InventoryService {
     }
     this.em.remove(category);
     return category;
+  }
+
+  // ------ PRODUCT MANAGEMENT ------
+
+  @Transactional()
+  public async createProduct(data: CreateProductParams) {
+    const productData = data.product;
+    const category = await this.em.findOne(Category, data.category_id);
+
+    if (!category) {
+      throw new HttpException(
+        `category ${data.category_id} does not exist`,
+        HttpStatus.CONFLICT,
+      );
+    }
+    const product = this.em.create(Product, { ...productData, category });
+    await this.em.flush();
+    return product;
   }
 }
