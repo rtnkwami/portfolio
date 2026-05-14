@@ -10,8 +10,10 @@ import {
 import { InventoryService } from './inventory.service';
 import {
   CreateCategoryDto,
-  CreateProductParams,
+  CreateProductDto,
+  ParamsDto,
   UpdateCategoryDto,
+  UpdateProductDto,
 } from './dto/requests.dto';
 import { CategoryParams } from './dto/requests.dto';
 import { CategoryResponse, PrivateProduct } from './dto/responses.dto';
@@ -90,7 +92,21 @@ export class InventoryController {
   })
   @ApiErrorResponses('Conflict')
   @Post('products')
-  public async createProduct(@Body() data: CreateProductParams) {
+  public async createProduct(@Body() data: CreateProductDto) {
     return this.inventoryService.createProduct(data);
+  }
+
+  @ApiEndpoint({
+    operationId: 'updateProduct',
+    status: 200,
+    type: PrivateProduct,
+  })
+  @ApiErrorResponses('NotFound')
+  @Patch('products/:id')
+  public async updateProduct(
+    @Param() params: ParamsDto,
+    @Body() data: UpdateProductDto,
+  ) {
+    return this.inventoryService.updateProduct(params.id, data);
   }
 }

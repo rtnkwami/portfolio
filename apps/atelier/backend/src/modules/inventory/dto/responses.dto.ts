@@ -11,6 +11,7 @@ const getAllCategoriesResponseSchema = z.object({
 });
 
 const privateProductSchema = z.object({
+  id: z.uuid(),
   name: z.string().nonempty(),
   description: z.string().optional(),
   price: z.number().positive(),

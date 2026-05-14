@@ -1,7 +1,7 @@
 import { createZodDto } from 'nestjs-zod';
 import z from 'zod';
 
-const categoryParamsSchema = z.object({
+const paramsSchema = z.object({
   id: z.uuid(),
 });
 
@@ -23,11 +23,17 @@ const createProductSchema = z.object({
   category_id: z.uuid(),
 });
 
+const updateProductSchema = createProductSchema.partial();
+
 //  --- EXPORTS ---
-export class CategoryParams extends createZodDto(categoryParamsSchema) {}
+export class ParamsDto extends createZodDto(paramsSchema) {}
+
+export class CategoryParams extends createZodDto(paramsSchema) {}
 
 export class CreateCategoryDto extends createZodDto(createCategorySchema) {}
 
 export class UpdateCategoryDto extends createZodDto(updateCategorySchema) {}
 
-export class CreateProductParams extends createZodDto(createProductSchema) {}
+export class CreateProductDto extends createZodDto(createProductSchema) {}
+
+export class UpdateProductDto extends createZodDto(updateProductSchema) {}

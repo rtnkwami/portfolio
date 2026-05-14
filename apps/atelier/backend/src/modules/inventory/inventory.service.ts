@@ -2,7 +2,11 @@ import { Transactional } from '@mikro-orm/decorators/legacy';
 import { EntityManager } from '@mikro-orm/postgresql';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { Category } from 'src/database/entities/category.entity';
-import { CreateCategoryDto, CreateProductParams } from './dto/requests.dto';
+import {
+  CreateCategoryDto,
+  CreateProductDto,
+  UpdateProductDto,
+} from './dto/requests.dto';
 import { Product } from 'src/database/entities/product.entity';
 
 @Injectable()
@@ -72,7 +76,7 @@ export class InventoryService {
   // ------ PRODUCT MANAGEMENT ------
 
   @Transactional()
-  public async createProduct(data: CreateProductParams) {
+  public async createProduct(data: CreateProductDto) {
     const productData = data.product;
     const category = await this.em.findOne(Category, data.category_id);
 
@@ -84,6 +88,20 @@ export class InventoryService {
     }
     const product = this.em.create(Product, { ...productData, category });
     await this.em.flush();
+    return product;
+  }
+
+  @Transactional()
+  public async updateProduct(id: string, data: UpdateProductDto) {
+    const product = await this.em.findOne(Product, id);
+
+    if (!product) {
+      throw new HttpException(
+        `product ${id} does not exist`,
+        HttpStatus.NOT_FOUND,
+      );
+    }
+    await this.em.upsert(Product, { id, ...data });
     return product;
   }
 }
