@@ -68,6 +68,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/inventory/products/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["updateProduct"];
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -99,7 +115,7 @@ export interface components {
             statusCode: number;
             message: string;
         };
-        CreateProductParams: {
+        CreateProductDto: {
             product: {
                 name: string;
                 description?: string;
@@ -110,11 +126,23 @@ export interface components {
             category_id: string;
         };
         PrivateProduct_Output: {
+            /** Format: uuid */
+            id: string;
             name: string;
             description?: string;
             price: number;
             category: string;
             stock: number;
+        };
+        UpdateProductDto: {
+            product?: {
+                name: string;
+                description?: string;
+                price: number;
+                stock: number;
+            };
+            /** Format: uuid */
+            category_id?: string;
         };
         ValidationErrorDto: {
             statusCode: number;
@@ -329,7 +357,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["CreateProductParams"];
+                "application/json": components["schemas"]["CreateProductDto"];
             };
         };
         responses: {
@@ -342,6 +370,47 @@ export interface operations {
                 };
             };
             409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StandardErrorDto"];
+                };
+            };
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InternalServerErrorDto"];
+                };
+            };
+        };
+    };
+    updateProduct: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateProductDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PrivateProduct_Output"];
+                };
+            };
+            404: {
                 headers: {
                     [name: string]: unknown;
                 };
