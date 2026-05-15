@@ -89,7 +89,18 @@ export class InventoryService {
     }
     const product = this.em.create(Product, { ...productData, category });
     await this.em.flush();
-    return product;
+
+    const dto = {
+      id: product.id,
+      name: product.name,
+      description: product.description,
+      price: product.price,
+      stock: product.stock,
+      category: product.category.name,
+      images: product.images.toArray(),
+    };
+
+    return dto;
   }
 
   @Transactional()

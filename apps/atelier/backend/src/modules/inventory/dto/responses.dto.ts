@@ -17,6 +17,7 @@ const privateProductSchema = z.object({
   price: z.number().positive(),
   category: z.string().nonempty(),
   stock: z.int().positive(),
+  images: z.array(z.string().nonempty()).default([]),
 });
 
 const publicProductSchema = privateProductSchema.omit({ stock: true });
