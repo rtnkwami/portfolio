@@ -151,15 +151,18 @@ export class InventoryService {
       },
     );
 
-    const dto = results.map((product) => ({
-      id: product.id,
-      name: product.name,
-      description: product.description,
-      price: product.price,
-      stock: product.stock,
-      category: product.category.name,
-      images: product.images.toArray(),
-    }));
+    const dto = results.map((product) => {
+      const images = product.images.map((i) => i.url);
+      return {
+        id: product.id,
+        name: product.name,
+        description: product.description,
+        price: product.price,
+        stock: product.stock,
+        category: product.category.name,
+        images,
+      };
+    });
 
     return {
       products: dto,
@@ -168,5 +171,18 @@ export class InventoryService {
       total: count,
       totalPages: Math.max(1, Math.ceil(count / limit)),
     };
+  }
+
+  public async getProduct(id: string) {
+    const product = await this.em.findOne(Product, id, {
+      populate: ['category', 'images'],
+    });
+
+    if (!product) {
+      throw new HttpException(
+        `product ${id} does not exist`,
+        HttpStatus.NOT_FOUND,
+      );
+    }
   }
 }
