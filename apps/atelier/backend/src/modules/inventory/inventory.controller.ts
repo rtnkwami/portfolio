@@ -126,4 +126,15 @@ export class InventoryController {
   public async searchProducts(@Query() query: ProductSearchParams) {
     return this.inventoryService.searchProducts(query);
   }
+
+  @ApiEndpoint({
+    operationId: 'getProduct',
+    status: 200,
+    type: PrivateProduct,
+  })
+  @ApiErrorResponses('NotFound')
+  @Get('products/:id')
+  public async getProduct(@Param() params: ParamsDto) {
+    return this.inventoryService.getProduct(params.id);
+  }
 }

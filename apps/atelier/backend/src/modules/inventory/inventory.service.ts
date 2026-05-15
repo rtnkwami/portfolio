@@ -184,5 +184,17 @@ export class InventoryService {
         HttpStatus.NOT_FOUND,
       );
     }
+    const images = product.images.map((i) => i.url);
+
+    const dto = {
+      id: product.id,
+      name: product.name,
+      description: product.description,
+      price: product.price,
+      stock: product.stock,
+      category: product.category.name,
+      images,
+    };
+    return dto;
   }
 }
