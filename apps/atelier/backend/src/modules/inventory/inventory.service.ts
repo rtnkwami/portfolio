@@ -143,11 +143,26 @@ export class InventoryService {
         price:
           minPrice || maxPrice ? { $gte: minPrice, $lte: maxPrice } : undefined,
       },
-      { limit, offset, orderBy: { name: 'ASC' } },
+      {
+        limit,
+        offset,
+        orderBy: { name: 'ASC' },
+        populate: ['category', 'images'],
+      },
     );
 
+    const dto = results.map((product) => ({
+      id: product.id,
+      name: product.name,
+      description: product.description,
+      price: product.price,
+      stock: product.stock,
+      category: product.category.name,
+      images: product.images.toArray(),
+    }));
+
     return {
-      products: results,
+      products: dto,
       page,
       perPage: limit,
       total: count,

@@ -20,7 +20,7 @@ export class ZodInterceptorError implements ExceptionFilter {
 
     const errors = exception.getZodError() as ZodError;
     this.logger.error(
-      `ZodError on [${request.method} ${request.url}]: ${JSON.stringify(errors.issues)}`,
+      `ZodError on [${request.method} ${request.url}]: ${JSON.stringify(errors.issues, null, 2)}`,
     );
 
     response.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
