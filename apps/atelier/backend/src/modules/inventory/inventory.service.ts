@@ -107,9 +107,14 @@ export class InventoryService {
   }
 
   public async searchProducts(filters: ProductSearchParams) {
-    const { name, minPrice, maxPrice, category, pagination } = filters;
-    const page = pagination?.page ?? 1;
-    const limit = pagination?.limit ?? 20;
+    const {
+      name,
+      minPrice,
+      maxPrice,
+      category,
+      page = 1,
+      limit = 20,
+    } = filters;
     const offset = (page - 1) * limit;
 
     if (minPrice && maxPrice && maxPrice < minPrice) {

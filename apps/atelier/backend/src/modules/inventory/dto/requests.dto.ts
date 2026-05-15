@@ -17,8 +17,8 @@ const createProductSchema = z.object({
   product: z.object({
     name: z.string().nonempty(),
     description: z.string().optional(),
-    price: z.number().positive(),
-    stock: z.number().positive(),
+    price: z.coerce.number().positive(),
+    stock: z.coerce.number().positive(),
   }),
   category_id: z.uuid(),
 });
@@ -27,15 +27,11 @@ const updateProductSchema = createProductSchema.partial();
 
 const searchProductSchema = z.object({
   name: z.string().optional(),
-  minPrice: z.number().min(1).optional(),
-  maxPrice: z.number().min(1).optional(),
+  minPrice: z.coerce.number().min(1).optional(),
+  maxPrice: z.coerce.number().min(1).optional(),
   category: z.uuid().optional(),
-  pagination: z
-    .object({
-      page: z.int().positive(),
-      limit: z.int().positive(),
-    })
-    .optional(),
+  page: z.coerce.number().int().positive().optional(),
+  limit: z.coerce.number().int().positive().optional(),
 });
 
 //  --- EXPORTS ---
