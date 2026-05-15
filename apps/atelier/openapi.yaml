@@ -341,6 +341,39 @@ paths:
       summary: ''
       tags:
         - Inventory
+    delete:
+      operationId: deleteProduct
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            format: uuid
+            pattern: >-
+              ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+            type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteResponse_Output'
+        '404':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StandardErrorDto'
+        '500':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerErrorDto'
+      summary: ''
+      tags:
+        - Inventory
 info:
   title: Atelier Main API
   description: ''
@@ -493,24 +526,17 @@ components:
     UpdateProductDto:
       type: object
       properties:
-        product:
-          type: object
-          properties:
-            name:
-              type: string
-              minLength: 1
-            description:
-              type: string
-            price:
-              type: number
-              exclusiveMinimum: 0
-            stock:
-              type: number
-              exclusiveMinimum: 0
-          required:
-            - name
-            - price
-            - stock
+        name:
+          type: string
+          minLength: 1
+        description:
+          type: string
+        price:
+          type: number
+          minimum: 1
+        stock:
+          type: number
+          minimum: 1
         category_id:
           type: string
           format: uuid
@@ -577,6 +603,17 @@ components:
         - perPage
         - total
         - totalPages
+      additionalProperties: false
+    DeleteResponse_Output:
+      type: object
+      properties:
+        deleted:
+          type: string
+          format: uuid
+          pattern: >-
+            ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+      required:
+        - deleted
       additionalProperties: false
     ValidationErrorDto:
       type: object

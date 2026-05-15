@@ -78,7 +78,7 @@ export interface paths {
         get: operations["getProduct"];
         put?: never;
         post?: never;
-        delete?: never;
+        delete: operations["deleteProduct"];
         options?: never;
         head?: never;
         patch: operations["updateProduct"];
@@ -137,12 +137,10 @@ export interface components {
             images: string[];
         };
         UpdateProductDto: {
-            product?: {
-                name: string;
-                description?: string;
-                price: number;
-                stock: number;
-            };
+            name?: string;
+            description?: string;
+            price?: number;
+            stock?: number;
             /** Format: uuid */
             category_id?: string;
         };
@@ -162,6 +160,10 @@ export interface components {
             perPage: number;
             total: number;
             totalPages: number;
+        };
+        DeleteResponse_Output: {
+            /** Format: uuid */
+            deleted: string;
         };
         ValidationErrorDto: {
             statusCode: number;
@@ -473,6 +475,43 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["PrivateProduct_Output"];
+                };
+            };
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StandardErrorDto"];
+                };
+            };
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InternalServerErrorDto"];
+                };
+            };
+        };
+    };
+    deleteProduct: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeleteResponse_Output"];
                 };
             };
             404: {
