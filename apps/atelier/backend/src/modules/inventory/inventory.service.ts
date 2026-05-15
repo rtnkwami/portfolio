@@ -5,6 +5,7 @@ import { Category } from 'src/database/entities/category.entity';
 import {
   CreateCategoryDto,
   CreateProductDto,
+  ProductSearchParams,
   UpdateProductDto,
 } from './dto/requests.dto';
 import { Product } from 'src/database/entities/product.entity';
@@ -103,5 +104,38 @@ export class InventoryService {
     }
     await this.em.upsert(Product, { id, ...data });
     return product;
+  }
+
+  public async searchProducts(filters: ProductSearchParams) {
+    const { name, minPrice, maxPrice, category, pagination } = filters;
+    const page = pagination?.page ?? 1;
+    const limit = pagination?.limit ?? 20;
+    const offset = (page - 1) * limit;
+
+    if (minPrice && maxPrice && maxPrice < minPrice) {
+      throw new HttpException(
+        'max price should be greater than min price',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    const [results, count] = await this.em.findAndCount(
+      Product,
+      {
+        name: name ? { $ilike: name } : undefined,
+        category: category ? { id: category } : undefined,
+        price:
+          minPrice || maxPrice ? { $gte: minPrice, $lte: maxPrice } : undefined,
+      },
+      { limit, offset, orderBy: { name: 'ASC' } },
+    );
+
+    return {
+      products: results,
+      page,
+      perPage: limit,
+      total: count,
+      totalPages: Math.max(1, Math.ceil(count / limit)),
+    };
   }
 }

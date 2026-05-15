@@ -25,6 +25,19 @@ const createProductSchema = z.object({
 
 const updateProductSchema = createProductSchema.partial();
 
+const searchProductSchema = z.object({
+  name: z.string().optional(),
+  minPrice: z.number().min(1).optional(),
+  maxPrice: z.number().min(1).optional(),
+  category: z.uuid().optional(),
+  pagination: z
+    .object({
+      page: z.int().positive(),
+      limit: z.int().positive(),
+    })
+    .optional(),
+});
+
 //  --- EXPORTS ---
 export class ParamsDto extends createZodDto(paramsSchema) {}
 
@@ -37,3 +50,5 @@ export class UpdateCategoryDto extends createZodDto(updateCategorySchema) {}
 export class CreateProductDto extends createZodDto(createProductSchema) {}
 
 export class UpdateProductDto extends createZodDto(updateProductSchema) {}
+
+export class ProductSearchParams extends createZodDto(searchProductSchema) {}

@@ -16,7 +16,17 @@ const privateProductSchema = z.object({
   description: z.string().optional(),
   price: z.number().positive(),
   category: z.string().nonempty(),
-  stock: z.number().positive(),
+  stock: z.int().positive(),
+});
+
+const publicProductSchema = privateProductSchema.omit({ stock: true });
+
+const searchProductResponseSchema = z.object({
+  products: z.array(publicProductSchema).default([]),
+  page: z.int().min(1).positive(),
+  perPage: z.int().min(1).positive(),
+  total: z.int().nonnegative(),
+  totalPages: z.int().positive(),
 });
 
 // --- EXPORTS ---
@@ -27,3 +37,9 @@ export class getAllCategoriesResponse extends createZodDto(
 ) {}
 
 export class PrivateProduct extends createZodDto(privateProductSchema) {}
+
+export class PublicProduct extends createZodDto(publicProductSchema) {}
+
+export class ProductSearchResults extends createZodDto(
+  searchProductResponseSchema,
+) {}

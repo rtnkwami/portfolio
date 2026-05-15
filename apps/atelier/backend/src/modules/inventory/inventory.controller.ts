@@ -6,17 +6,23 @@ import {
   Param,
   Patch,
   Post,
+  Query,
 } from '@nestjs/common';
 import { InventoryService } from './inventory.service';
 import {
   CreateCategoryDto,
   CreateProductDto,
   ParamsDto,
+  ProductSearchParams,
   UpdateCategoryDto,
   UpdateProductDto,
 } from './dto/requests.dto';
 import { CategoryParams } from './dto/requests.dto';
-import { CategoryResponse, PrivateProduct } from './dto/responses.dto';
+import {
+  CategoryResponse,
+  PrivateProduct,
+  ProductSearchResults,
+} from './dto/responses.dto';
 import { getAllCategoriesResponse } from './dto/responses.dto';
 import { ApiEndpoint, ApiErrorResponses } from '../shared/openapi.decorator';
 
@@ -90,7 +96,7 @@ export class InventoryController {
     status: 201,
     type: PrivateProduct,
   })
-  @ApiErrorResponses('Conflict')
+  @ApiErrorResponses('Conflict', 'BadRequest')
   @Post('products')
   public async createProduct(@Body() data: CreateProductDto) {
     return this.inventoryService.createProduct(data);
@@ -101,12 +107,23 @@ export class InventoryController {
     status: 200,
     type: PrivateProduct,
   })
-  @ApiErrorResponses('NotFound')
+  @ApiErrorResponses('NotFound', 'BadRequest')
   @Patch('products/:id')
   public async updateProduct(
     @Param() params: ParamsDto,
     @Body() data: UpdateProductDto,
   ) {
     return this.inventoryService.updateProduct(params.id, data);
+  }
+
+  @ApiEndpoint({
+    operationId: 'searchProducts',
+    status: 200,
+    type: ProductSearchResults,
+  })
+  @ApiErrorResponses('BadRequest')
+  @Get('products')
+  public async searchProducts(@Query() query: ProductSearchParams) {
+    return this.inventoryService.searchProducts(query);
   }
 }
