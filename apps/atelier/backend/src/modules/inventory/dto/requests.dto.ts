@@ -23,7 +23,13 @@ const createProductSchema = z.object({
   category_id: z.uuid(),
 });
 
-const updateProductSchema = createProductSchema.partial();
+const updateProductSchema = z.object({
+  name: z.string().nonempty().optional(),
+  description: z.string().optional(),
+  price: z.coerce.number().min(1).optional(),
+  stock: z.coerce.number().min(1).optional(),
+  category_id: z.uuid().optional(),
+});
 
 const searchProductSchema = z.object({
   name: z.string().optional(),

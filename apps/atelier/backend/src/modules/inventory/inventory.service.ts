@@ -105,7 +105,10 @@ export class InventoryService {
 
   @Transactional()
   public async updateProduct(id: string, data: UpdateProductDto) {
-    const product = await this.em.findOne(Product, id);
+    console.log(data);
+    const product = await this.em.findOne(Product, id, {
+      populate: ['category', 'images'],
+    });
 
     if (!product) {
       throw new HttpException(
@@ -113,8 +116,29 @@ export class InventoryService {
         HttpStatus.NOT_FOUND,
       );
     }
-    await this.em.upsert(Product, { id, ...data });
-    return product;
+
+    const { category_id, ...fields } = data;
+
+    if (fields.name) product.name = fields.name;
+    if (fields.description) product.description = fields.description;
+    if (fields.price) product.price = fields.price;
+    if (fields.stock) product.stock = fields.stock;
+
+    if (category_id) {
+      product.category = this.em.getReference(Category, category_id);
+    }
+
+    const images = product.images.map((i) => i.url);
+    const dto = {
+      id: product.id,
+      name: product.name,
+      description: product.description,
+      price: product.price,
+      stock: product.stock,
+      category: product.category.name,
+      images,
+    };
+    return dto;
   }
 
   public async searchProducts(filters: ProductSearchParams) {
