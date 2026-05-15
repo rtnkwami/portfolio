@@ -30,8 +30,8 @@ const searchProductSchema = z.object({
   minPrice: z.coerce.number().min(1).optional(),
   maxPrice: z.coerce.number().min(1).optional(),
   category: z.uuid().optional(),
-  page: z.coerce.number().int().positive().optional(),
-  limit: z.coerce.number().int().positive().optional(),
+  page: z.coerce.number().int().positive().min(1).optional(),
+  limit: z.coerce.number().int().positive().min(1).optional(),
 });
 
 //  --- EXPORTS ---

@@ -14,9 +14,9 @@ const privateProductSchema = z.object({
   id: z.uuid(),
   name: z.string().nonempty(),
   description: z.string().optional(),
-  price: z.number().positive(),
+  price: z.number().min(1),
   category: z.string().nonempty(),
-  stock: z.int().positive(),
+  stock: z.int().min(0),
   images: z.array(z.url().nonempty()).default([]),
 });
 
@@ -24,10 +24,10 @@ const publicProductSchema = privateProductSchema.omit({ stock: true });
 
 const searchProductResponseSchema = z.object({
   products: z.array(publicProductSchema).default([]),
-  page: z.int().min(1).positive(),
-  perPage: z.int().min(1).positive(),
-  total: z.int().nonnegative(),
-  totalPages: z.int().positive(),
+  page: z.int().min(1),
+  perPage: z.int().min(1),
+  total: z.int().min(0),
+  totalPages: z.int().min(1),
 });
 
 // --- EXPORTS ---
