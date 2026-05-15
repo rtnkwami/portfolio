@@ -59,7 +59,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        get: operations["searchProducts"];
         put?: never;
         post: operations["createProduct"];
         delete?: never;
@@ -75,7 +75,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        get: operations["getProduct"];
         put?: never;
         post?: never;
         delete?: never;
@@ -133,6 +133,8 @@ export interface components {
             price: number;
             category: string;
             stock: number;
+            /** @default [] */
+            images: string[];
         };
         UpdateProductDto: {
             product?: {
@@ -143,6 +145,23 @@ export interface components {
             };
             /** Format: uuid */
             category_id?: string;
+        };
+        ProductSearchResults_Output: {
+            /** @default [] */
+            products: {
+                /** Format: uuid */
+                id: string;
+                name: string;
+                description?: string;
+                price: number;
+                category: string;
+                /** @default [] */
+                images: string[];
+            }[];
+            page: number;
+            perPage: number;
+            total: number;
+            totalPages: number;
         };
         ValidationErrorDto: {
             statusCode: number;
@@ -348,6 +367,48 @@ export interface operations {
             };
         };
     };
+    searchProducts: {
+        parameters: {
+            query?: {
+                name?: string;
+                minPrice?: number;
+                maxPrice?: number;
+                category?: string;
+                page?: number;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProductSearchResults_Output"];
+                };
+            };
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StandardErrorDto"];
+                };
+            };
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InternalServerErrorDto"];
+                };
+            };
+        };
+    };
     createProduct: {
         parameters: {
             query?: never;
@@ -369,7 +430,52 @@ export interface operations {
                     "application/json": components["schemas"]["PrivateProduct_Output"];
                 };
             };
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StandardErrorDto"];
+                };
+            };
             409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StandardErrorDto"];
+                };
+            };
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InternalServerErrorDto"];
+                };
+            };
+        };
+    };
+    getProduct: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PrivateProduct_Output"];
+                };
+            };
+            404: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -408,6 +514,14 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["PrivateProduct_Output"];
+                };
+            };
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StandardErrorDto"];
                 };
             };
             404: {
