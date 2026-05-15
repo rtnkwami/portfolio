@@ -30,6 +30,10 @@ const searchProductResponseSchema = z.object({
   totalPages: z.int().min(1),
 });
 
+const deleteSchema = z.object({
+  deleted: z.uuid(),
+});
+
 // --- EXPORTS ---
 export class CategoryResponse extends createZodDto(categoryResponseSchema) {}
 
@@ -44,3 +48,5 @@ export class PublicProduct extends createZodDto(publicProductSchema) {}
 export class ProductSearchResults extends createZodDto(
   searchProductResponseSchema,
 ) {}
+
+export class DeleteResponse extends createZodDto(deleteSchema) {}

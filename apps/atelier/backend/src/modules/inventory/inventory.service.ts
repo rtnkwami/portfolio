@@ -221,4 +221,18 @@ export class InventoryService {
     };
     return dto;
   }
+
+  @Transactional()
+  public async deleteProduct(id: string) {
+    const product = await this.em.findOne(Product, id);
+
+    if (!product) {
+      throw new HttpException(
+        `product ${id} does not exist`,
+        HttpStatus.NOT_FOUND,
+      );
+    }
+    this.em.remove(product);
+    return { deleted: product.id };
+  }
 }

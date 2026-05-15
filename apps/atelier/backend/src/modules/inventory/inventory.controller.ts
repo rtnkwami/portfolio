@@ -20,6 +20,7 @@ import {
 import { CategoryParams } from './dto/requests.dto';
 import {
   CategoryResponse,
+  DeleteResponse,
   PrivateProduct,
   ProductSearchResults,
 } from './dto/responses.dto';
@@ -136,5 +137,16 @@ export class InventoryController {
   @Get('products/:id')
   public async getProduct(@Param() params: ParamsDto) {
     return this.inventoryService.getProduct(params.id);
+  }
+
+  @ApiEndpoint({
+    operationId: 'deleteProduct',
+    status: 200,
+    type: DeleteResponse,
+  })
+  @ApiErrorResponses('NotFound')
+  @Delete('products/:id')
+  public async deleteProduct(@Param() params: ParamsDto) {
+    return this.inventoryService.deleteProduct(params.id);
   }
 }
