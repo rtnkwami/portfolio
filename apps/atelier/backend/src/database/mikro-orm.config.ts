@@ -11,4 +11,5 @@ export default defineConfig({
   },
   extensions: [Migrator],
   clientUrl: process.env.DATABASE_URL,
+  ignoreUndefinedInQuery: true,
 });
