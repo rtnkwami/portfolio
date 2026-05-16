@@ -34,6 +34,11 @@ const deleteSchema = z.object({
   deleted: z.uuid(),
 });
 
+const imageUploadSchema = z.object({
+  uploadTo: z.url(),
+  imageId: z.uuid(),
+});
+
 // --- EXPORTS ---
 export class CategoryResponse extends createZodDto(categoryResponseSchema) {}
 
@@ -50,3 +55,5 @@ export class ProductSearchResults extends createZodDto(
 ) {}
 
 export class DeleteResponse extends createZodDto(deleteSchema) {}
+
+export class ImageUploadResponse extends createZodDto(imageUploadSchema) {}

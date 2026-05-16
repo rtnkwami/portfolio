@@ -21,6 +21,7 @@ import { CategoryParams } from './dto/requests.dto';
 import {
   CategoryResponse,
   DeleteResponse,
+  ImageUploadResponse,
   PrivateProduct,
   ProductSearchResults,
 } from './dto/responses.dto';
@@ -137,6 +138,17 @@ export class InventoryController {
   @Get('products/:id')
   public async getProduct(@Param() params: ParamsDto) {
     return this.inventoryService.getProduct(params.id);
+  }
+
+  @ApiEndpoint({
+    operationId: 'getImageUploadLink',
+    status: 200,
+    type: ImageUploadResponse,
+  })
+  @ApiErrorResponses('NotFound')
+  @Get('products/:id/images')
+  public async getImageUploadLink(@Param() params: ParamsDto) {
+    return this.inventoryService.generateImageUploadLink(params.id);
   }
 
   @ApiEndpoint({

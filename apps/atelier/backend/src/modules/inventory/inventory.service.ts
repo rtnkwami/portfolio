@@ -9,10 +9,16 @@ import {
   UpdateProductDto,
 } from './dto/requests.dto';
 import { Product } from 'src/database/entities/product.entity';
+import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
+import { randomUUID } from 'crypto';
 
 @Injectable()
 export class InventoryService {
-  constructor(private readonly em: EntityManager) {}
+  constructor(
+    private readonly em: EntityManager,
+    private readonly s3Client: S3Client,
+  ) {}
 
   public async createCategory(data: CreateCategoryDto) {
     const category = this.em.create(Category, { name: data.name });
@@ -220,6 +226,27 @@ export class InventoryService {
       images,
     };
     return dto;
+  }
+
+  public async generateImageUploadLink(productId: string) {
+    const product = await this.em.findOne(Product, productId);
+
+    if (!product) {
+      throw new HttpException(
+        `product ${productId} does not exist`,
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    const imageId = randomUUID();
+    const uploadCommand = new PutObjectCommand({
+      Bucket: '',
+      Key: `images/${productId}/${imageId}`,
+    });
+    const url = await getSignedUrl(this.s3Client, uploadCommand, {
+      expiresIn: 3600,
+    });
+    return { uploadTo: url, imageId };
   }
 
   @Transactional()
