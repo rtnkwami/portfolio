@@ -34,4 +34,3 @@ async function openapiGen() {
   await app.close();
 }
 void openapiGen();
-// this is a test
