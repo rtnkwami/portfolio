@@ -12,6 +12,8 @@ RUN pnpm install -g @moonrepo/cli
 
 COPY ./.moon/docker/configs ./
 
+# moon cli seems to need git for some reason
+RUN apk add --no-cache git
 RUN moon docker setup
 
 COPY ./.moon/docker/sources ./

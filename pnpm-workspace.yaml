@@ -9,6 +9,6 @@ forceLegacyDeploy: true
 syncInjectedDepsAfterScripts:
   - build
 
-allowBuilds:
-  '@nestjs/core': false
-  '@scarf/scarf': false
+strictDepBuilds: false
+
+allowBuilds: {}
