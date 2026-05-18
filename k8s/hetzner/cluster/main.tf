@@ -1,13 +1,13 @@
 module "kubernetes" {
   source = "hcloud-k8s/kubernetes/hcloud"
-  version = "~>4.3.0"
+  version = "~>4.0"
 
   hcloud_token = var.hcloud_token
   cluster_delete_protection = false
 
   cluster_name = "homelab"
-  cluster_talosconfig_path = "talosconfig"
-  cluster_kubeconfig_path = "kubeconfig"
+  cluster_talosconfig_path = "./outputs/talosconfig"
+  cluster_kubeconfig_path = "./outputs/kubeconfig"
 
   cilium_gateway_api_enabled = true
   cilium_hubble_enabled = true

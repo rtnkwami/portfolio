@@ -9,6 +9,11 @@ terraform {
       source = "hetznercloud/hcloud"
       version = "~>1.0"
     }
+
+    helm = {
+      source = "hashicorp/helm"
+      version = "~>3.0"
+    }
   }
 
   backend "s3" {
