@@ -18,18 +18,18 @@ tasks:
 
   plan:
     command: 'tofu plan'
-    args: '-out .plans/tfplan'
+    args: '-out outputs/tfplan'
     toolchain: 'system'
     deps: ['~:init']
-    outputs: ['.plans/tfplan']
+    outputs: ['outputs/tfplan']
     options:
       cache: false
 
   deploy:
-    command: 'tofu apply .plans/tfplan'
+    command: 'tofu apply outputs/tfplan'
     toolchain: 'system'
     deps: ['~:plan']
-    inputs: ['.plans/tfplan']
+    inputs: ['outputs/tfplan']
     options:
       cache: false
 

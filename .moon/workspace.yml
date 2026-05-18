@@ -8,6 +8,7 @@ projects:
   atelier/contracts: "packages/atelier/contracts"
 
   eks: k8s/eks/cluster
+  hcloud: k8s/hetzner/cluster
   scripts: scripts
 
 vcs:
