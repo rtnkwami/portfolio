@@ -31,5 +31,4 @@ COPY --chown=service:service --from=base /prod/atelier/backend/dist ./dist
 
 USER service
 
-# entrypoint of the container. Change to whatever suites the app
 CMD ["node", "dist/main.js"]
