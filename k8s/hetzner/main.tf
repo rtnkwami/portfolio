@@ -12,8 +12,9 @@ module "kubernetes" {
   cilium_gateway_api_enabled = true
   cilium_hubble_enabled = true
   cilium_hubble_relay_enabled = true
+  cilium_service_monitor_enabled = true
+  
   cluster_autoscaler_discovery_enabled = true
-
   cluster_allow_scheduling_on_control_planes = false
   
   control_plane_nodepools = [
