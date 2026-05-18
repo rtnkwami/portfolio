@@ -15,27 +15,6 @@ Resources:
       BucketName: niovial-portfolio-tf-state
       VersioningConfiguration:
         Status: Enabled
-    
-  PortfolioEcrRepo:
-    Type: AWS::ECR::PublicRepository
-    Properties:
-      RepositoryName: portfolio
-    DeletionPolicy: Retain
-    UpdateReplacePolicy: Retain
-
-  AtelierBackendEcrRepo:
-    Type: AWS::ECR::PublicRepository
-    Properties:
-      RepositoryName: atelier-backend
-    DeletionPolicy: Retain
-    UpdateReplacePolicy: Retain
-
-  AtelierFrontendEcrRepo:
-    Type: AWS::ECR::PublicRepository
-    Properties:
-      RepositoryName: atelier-frontend
-    DeletionPolicy: Retain
-    UpdateReplacePolicy: Retain
   
   GHActionsProvider:
     Type: AWS::IAM::OIDCProvider
@@ -44,7 +23,7 @@ Resources:
       ClientIdList:
         - "sts.amazonaws.com"
 
-  PortfolioCIRole:
+  TerraformStateManager:
     Type: AWS::IAM::Role
     Properties:
       AssumeRolePolicyDocument:
@@ -61,12 +40,24 @@ Resources:
                 "token.actions.githubusercontent.com:ref": "refs/heads/main"
               StringLike:
                 "token.actions.githubusercontent.com:sub": !Sub "repo:${GitHubRepository}:*"
-      ManagedPolicyArns:
-        - !Sub arn:${AWS::Partition}:iam::aws:policy/AdministratorAccess
+      Policies:
+        - PolicyName: TerraformStateAccess
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:GetObject
+                  - s3:ListBucket
+                  - s3:DeleteObject
+                  - s3:PutObject
+                Resource:
+                  - !GetAtt TerraformStateBucket.Arn
+                  - !Sub "${TerraformStateBucket.Arn}/*"
 
 Outputs:
   TfStateBucketName:
     Value: !Ref TerraformStateBucket
-  PortfolioCIRoleArn:
-    Value: !GetAtt PortfolioCIRole.Arn
+  TerraformStateManagerRoleArn:
+    Value: !GetAtt TerraformStateManager.Arn
     
