@@ -70,5 +70,6 @@
     "configPaths": [
       "./src/database/mikro-orm.config.ts"
     ]
-  }
+  },
+  "files": ["dist"]
 }

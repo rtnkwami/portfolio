@@ -20,8 +20,7 @@ node:
 
 
 pnpm:
-  version: 10.33.0
-
+  version: 11.1.2
 
 
 unstable_python:
