@@ -36,3 +36,10 @@ system:
     targetRevision: 0.28.2
     namespace: cnpg-system
     syncWave: "2"
+
+  keda:
+    chart: keda
+    repoURL: https://kedacore.github.io/charts
+    targetRevision: 2.19.0
+    namespace: keda
+    syncWave: "2"
