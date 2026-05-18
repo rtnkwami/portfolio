@@ -1,0 +1,42 @@
+project:
+  name: Hetzner Cloud 
+  description: |
+    This project deploys a K8s cluster to Hetzner as an alternative to EKS so that other apps in this monorepo
+    can be deployed.
+
+  maintainers:
+    - Robert Kwami
+
+tags: [Root, Hcloud]
+
+stack: infrastructure
+
+tasks:
+  init:
+    command: 'tofu init'
+    toolchain: 'system'
+
+  plan:
+    command: 'tofu plan'
+    args: '-out .plans/tfplan'
+    toolchain: 'system'
+    deps: ['~:init']
+    outputs: ['.plans/tfplan']
+    options:
+      cache: false
+
+  deploy:
+    command: 'tofu apply .plans/tfplan'
+    toolchain: 'system'
+    deps: ['~:plan']
+    inputs: ['.plans/tfplan']
+    options:
+      cache: false
+
+  destroy:
+    command: 'tofu destroy'
+    args: '--auto-approve'
+    toolchain: 'system'
+    deps: ['~:init']
+    options:
+      cache: false

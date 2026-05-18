@@ -11,7 +11,5 @@ coverage
 .env
 
 *terraform*
-k8s/cluster/.plans/tfplan
+k8s/**/outputs
 *.tfvars
-*kubeconfig*
-*talosconfig*
