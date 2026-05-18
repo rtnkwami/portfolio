@@ -10,5 +10,5 @@ syncInjectedDepsAfterScripts:
   - build
 
 allowBuilds:
-  '@nestjs/core': set this to true or false
-  '@scarf/scarf': set this to true or false
+  '@nestjs/core': false
+  '@scarf/scarf': false
