@@ -19,21 +19,26 @@ tags:
 
 stack: backend
 
-dependsOn:
-  - atelier/contracts
-
 tasks:
   build:
     command: 'pnpm build'
-    deps:
-      - '^:build'
     outputs:
       - 'dist/**/*'
   test:
     command: 'pnpm test'
-    deps:
-      - '^:build'
   lint:
     command: 'pnpm lint'
+  
+  openapi:
+    command: 'pnpm openapi'
     deps:
-      - '^:build'
+      - 'build'
+  generate-sdk:
+    command: pnpm -w oats apps/atelier/openapi.yaml -o packages/atelier/contracts/src/schema.ts
+    deps:
+      - openapi
+  sdk-sync:
+    command: moon run atelier/contracts:build
+    deps:
+      - generate-sdk
+  

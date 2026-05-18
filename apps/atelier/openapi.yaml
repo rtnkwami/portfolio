@@ -1,0 +1,259 @@
+openapi: 3.0.0
+paths:
+  /:
+    get:
+      operationId: AppController_getHello
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags:
+        - App
+  /inventory/categories:
+    post:
+      operationId: createCategory
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCategoryDto'
+      responses:
+        '201':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoryResponse_Output'
+        '500':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerErrorDto'
+      summary: ''
+      tags:
+        - Inventory
+    get:
+      operationId: getAllCategories
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/getAllCategoriesResponse_Output'
+        '500':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerErrorDto'
+      summary: ''
+      tags:
+        - Inventory
+  /inventory/categories/{id}:
+    patch:
+      operationId: updateCategory
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            format: uuid
+            pattern: >-
+              ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCategoryDto'
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoryResponse_Output'
+        '500':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerErrorDto'
+      summary: ''
+      tags:
+        - Inventory
+    get:
+      operationId: getCategory
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            format: uuid
+            pattern: >-
+              ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+            type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoryResponse_Output'
+        '404':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StandardErrorDto'
+        '500':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerErrorDto'
+      summary: ''
+      tags:
+        - Inventory
+    delete:
+      operationId: deleteCategory
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            format: uuid
+            pattern: >-
+              ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+            type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoryResponse_Output'
+        '404':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StandardErrorDto'
+        '409':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StandardErrorDto'
+        '500':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerErrorDto'
+      summary: ''
+      tags:
+        - Inventory
+info:
+  title: Atelier Main API
+  description: ''
+  version: '1.0'
+  contact: {}
+tags: []
+servers: []
+components:
+  schemas:
+    InternalServerErrorDto:
+      type: object
+      properties:
+        statusCode:
+          type: number
+        message:
+          type: string
+      required:
+        - statusCode
+        - message
+    CreateCategoryDto:
+      type: object
+      properties:
+        name:
+          type: string
+      required:
+        - name
+    CategoryResponse_Output:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          pattern: >-
+            ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+        name:
+          type: string
+      required:
+        - id
+        - name
+      additionalProperties: false
+    UpdateCategoryDto:
+      type: object
+      properties:
+        name:
+          type: string
+      required:
+        - name
+    getAllCategoriesResponse_Output:
+      type: object
+      properties:
+        categories:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                format: uuid
+                pattern: >-
+                  ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+              name:
+                type: string
+            required:
+              - id
+              - name
+            additionalProperties: false
+      required:
+        - categories
+      additionalProperties: false
+    StandardErrorDto:
+      type: object
+      properties:
+        error:
+          type: string
+        statusCode:
+          type: number
+        message:
+          type: string
+      required:
+        - error
+        - statusCode
+        - message
+    ValidationErrorDto:
+      type: object
+      properties:
+        statusCode:
+          type: number
+        error:
+          type: string
+        errors:
+          type: array
+          items:
+            type: object
+      required:
+        - statusCode
+        - error
+        - errors

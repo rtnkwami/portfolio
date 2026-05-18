@@ -1,299 +1,70 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
-import {
-  EntityManager,
-  FilterQuery,
-  LockMode,
-  TransactionPropagation,
-  wrap,
-} from '@mikro-orm/postgresql';
-import type {
-  CommitStockParams,
-  CreateProductParams,
-  ReserveStockParams,
-  SearchProductParams,
-  UpdateProductParams,
-} from '@atelier/contracts/types';
-import { Product } from 'src/database/entities/product.entity';
 import { Transactional } from '@mikro-orm/decorators/legacy';
-import { Reservation } from 'src/database/entities/reservation.entity';
-import { ReservationItem } from 'src/database/entities/reservation-item.entity';
+import { EntityManager } from '@mikro-orm/postgresql';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { Category } from 'src/database/entities/category.entity';
+import { CreateCategoryDto } from './dto/requests.dto';
 
 @Injectable()
 export class InventoryService {
   constructor(private readonly em: EntityManager) {}
 
-  public async create(data: CreateProductParams) {
-    const product = this.em.create(Product, data);
+  public async createCategory(data: CreateCategoryDto) {
+    const category = this.em.create(Category, { name: data.name });
     await this.em.flush();
-
-    const returnDTO = {
-      id: product.id,
-      name: product.name,
-      description: product.description,
-      category: product.category,
-      price: product.price,
-      stock: product.stock,
-      images: product.images,
-      createdAt: product.createdAt.toISOString(),
-      updatedAt: product.updatedAt.toISOString(),
-    };
-
-    return returnDTO;
-  }
-
-  public async quickSearch(name: string) {
-    const results = await this.em.findAll(Product, {
-      where: { name: { $ilike: `${name}%` } },
-    });
-
-    const dto = {
-      data: results.map((product) => ({
-        id: product.id,
-        name: product.name,
-      })),
-    };
-
-    return dto;
-  }
-
-  public async getProductCategories() {
-    const results = await this.em.findAll(Product, {
-      fields: ['category'],
-    });
-
-    const dto = {
-      categories: [...new Set(results.map((product) => product.category))],
-    };
-
-    return dto;
-  }
-
-  public async search(filters: SearchProductParams) {
-    const {
-      page = 1,
-      limit = 20,
-      name,
-      category,
-      minPrice,
-      maxPrice,
-    } = filters;
-    const offset = (page - 1) * limit;
-    const search: FilterQuery<Product> = {};
-
-    if (name) {
-      search.name = { $ilike: `${name}%` };
-    }
-
-    if (category) {
-      search.category = category;
-    }
-
-    if (minPrice || maxPrice) {
-      search.price = {};
-      if (minPrice) search.price.$gte = minPrice;
-      if (maxPrice) search.price.$lte = maxPrice;
-    }
-
-    const [results, count] = await this.em.findAndCount(
-      Product,
-      { ...search },
-      { limit, offset },
-    );
-
-    const dto = results.map((product) => ({
-      id: product.id,
-      name: product.name,
-      description: product.description,
-      category: product.category,
-      price: product.price,
-      images: product.images,
-    }));
-
-    return {
-      products: dto,
-      page,
-      perPage: limit,
-      totalItems: count,
-      totalPages: Math.ceil(count / limit),
-    };
-  }
-
-  public async getProduct(id: string) {
-    const product = await this.em.findOne(Product, id);
-
-    if (!product) {
-      throw new NotFoundException(`Product ${id} does not exist`);
-    }
-
-    const dto = {
-      id: product.id,
-      name: product.name,
-      description: product.description,
-      category: product.category,
-      price: product.price,
-      stock: product.stock,
-      images: product.images,
-    };
-
-    return dto;
+    return category;
   }
 
   @Transactional()
-  public async updateProduct(id: string, data: UpdateProductParams) {
-    const product = await this.em.findOne(Product, id);
+  public async updateCategory(id: string, name: string) {
+    const category = await this.em.findOne(Category, id);
 
-    if (!product) {
-      throw new NotFoundException(`Product ${id} does not exist`);
+    if (!category) {
+      throw new HttpException(
+        `category ${id} does not exist`,
+        HttpStatus.NOT_FOUND,
+      );
     }
-    wrap(product).assign(data);
+    category.name = name;
+    return category;
+  }
 
-    const dto = {
-      id: product.id,
-      name: product.name,
-      description: product.description,
-      category: product.category,
-      price: product.price,
-      stock: product.stock,
-      images: product.images,
-      createdAt: product.createdAt.toISOString(),
-      updatedAt: product.updatedAt.toISOString(),
-    };
-    return dto;
+  public async getAllCategories() {
+    const categories = await this.em.findAll(Category, {});
+    return categories;
+  }
+
+  public async getCategory(id: string) {
+    const category = await this.em.findOne(Category, id);
+    if (!category) {
+      throw new HttpException(
+        `category ${id} does not exist`,
+        HttpStatus.NOT_FOUND,
+      );
+    }
+    return category;
   }
 
   @Transactional()
-  public async deleteProduct(id: string) {
-    const product = await this.em.findOne(Product, id);
-
-    if (!product) {
-      throw new NotFoundException(`Product ${id} does not exist`);
-    }
-    this.em.remove(product);
-
-    return { deleted: product.id };
-  }
-
-  private async findOrCreateReservation(id: string) {
-    const existing = await this.em.findOne(
-      Reservation,
-      { id },
-      { populate: ['items'] },
-    );
-    const reservation = existing ?? new Reservation();
-
-    if (!existing) {
-      reservation.id = id;
-      this.em.persist(reservation);
-    }
-    return reservation;
-  }
-
-  private async validateProductStock(id: string, requestedQty: number) {
-    const product = await this.em.findOne(
-      Product,
-      { id },
-      {
-        lockMode: LockMode.PESSIMISTIC_WRITE, // use this lock mode to make transactions trying the same operations wait until the first one served finishes.
-        populate: ['reservations'],
-      },
-    );
-
-    if (!product) {
-      throw new NotFoundException(`Product ${id} does not exist`);
-    }
-
-    const reservedStock = product.reservations.reduce(
-      (acc, item) => acc + item.quantity,
-      0,
-    );
-    const totalRequestedStock = reservedStock + requestedQty;
-
-    if (product.stock - totalRequestedStock < 0) {
-      throw new BadRequestException({
-        message: `insufficient stock for product ${product.id}`,
-        reason: {
-          requested: requestedQty,
-          stock: product.stock - reservedStock,
-        },
-      });
-    }
-    return product;
-  }
-
-  @Transactional({ propagation: TransactionPropagation.REQUIRED })
-  public async reserveInventory(data: ReserveStockParams) {
-    const sortedRequestItems = [...data.items].sort((a, b) =>
-      a.id.localeCompare(b.id),
-    );
-    const reservation = await this.findOrCreateReservation(data.orderId);
-
-    const reservationItems: ReservationItem[] = [];
-
-    for (const requested of sortedRequestItems) {
-      const product = await this.validateProductStock(
-        requested.id,
-        requested.quantity,
-      );
-
-      const item = new ReservationItem(
-        product,
-        reservation,
-        requested.quantity,
-      );
-      reservationItems.push(item);
-    }
-    reservation.items.set(reservationItems);
-    return { orderId: data.orderId };
-  }
-
-  @Transactional({ propagation: TransactionPropagation.REQUIRED })
-  public async commitInventoryReservation(data: CommitStockParams) {
-    const reservation = await this.em.findOne(
-      Reservation,
-      { id: data.reservationId },
-      {
-        populate: ['items'],
-        populateOrderBy: {
-          items: {
-            product: { id: 'asc' },
-          },
-        },
-      },
-    );
-
-    if (!reservation) {
-      throw new BadRequestException(
-        `Reservation ${data.reservationId} does not exist`,
-      );
-    }
-
-    const productIds: string[] = [];
-    const reservedItems = reservation.items.getItems();
-
-    reservedItems.forEach((item) => {
-      productIds.push(item.product.id);
+  public async deleteCategory(id: string) {
+    const category = await this.em.findOne(Category, id, {
+      populate: ['products.name'],
     });
 
-    const products = await this.em.findAll(Product, {
-      where: {
-        id: { $in: productIds },
-      },
-      lockMode: LockMode.PESSIMISTIC_WRITE,
-    });
-
-    products.forEach((product) => {
-      const reservedItem = reservedItems.find(
-        (item) => item.product.id === product.id,
+    if (!category) {
+      throw new HttpException(
+        `category ${id} does not exist`,
+        HttpStatus.NOT_FOUND,
       );
-      if (reservedItem) {
-        product.stock -= reservedItem.quantity;
-        reservation.items.remove(reservedItem);
-      }
-    });
-    this.em.remove(reservation);
+    }
+    const productCount = category.products.count();
+
+    if (productCount > 0) {
+      throw new HttpException(
+        `category ${category.name} has existing products`,
+        HttpStatus.CONFLICT,
+      );
+    }
+    this.em.remove(category);
+    return category;
   }
 }

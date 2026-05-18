@@ -1,69 +1,81 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Patch,
-  Param,
+  Controller,
   Delete,
-  UsePipes,
-  Query,
+  Get,
+  Param,
+  Patch,
+  Post,
 } from '@nestjs/common';
 import { InventoryService } from './inventory.service';
-import { ZodValidationPipe } from 'src/pipes/request.validation.pipe';
-import z from 'zod';
-import {
-  CreateProductSchema,
-  SearchProductSchema,
-} from '@atelier/contracts/schemas';
-import type {
-  CreateProductParams,
-  SearchProductParams,
-  UpdateProductParams,
-} from '@atelier/contracts/types';
+import { CreateCategoryDto, UpdateCategoryDto } from './dto/requests.dto';
+import { CategoryParams } from './dto/requests.dto';
+import { CategoryResponse } from './dto/responses.dto';
+import { getAllCategoriesResponse } from './dto/responses.dto';
+import { ApiEndpoint, ApiErrorResponses } from '../shared/openapi.decorator';
 
+@ApiErrorResponses()
 @Controller('inventory')
 export class InventoryController {
   constructor(private readonly inventoryService: InventoryService) {}
 
-  @Post()
-  @UsePipes(new ZodValidationPipe(CreateProductSchema))
-  create(@Body() data: CreateProductParams) {
-    return this.inventoryService.create(data);
+  // --- CATEGORY ENDPOINTS ---
+
+  @ApiEndpoint({
+    operationId: 'createCategory',
+    status: 201,
+    type: CategoryResponse,
+  })
+  @Post('categories')
+  public async createCategory(@Body() data: CreateCategoryDto) {
+    return this.inventoryService.createCategory(data);
   }
 
-  @Get('search')
-  @UsePipes(new ZodValidationPipe(z.string()))
-  async quickSearch(@Query('name') name: string) {
-    return await this.inventoryService.quickSearch(name);
+  @ApiEndpoint({
+    operationId: 'updateCategory',
+    status: 200,
+    type: CategoryResponse,
+  })
+  @Patch('categories/:id')
+  public updateCategory(
+    @Param() params: CategoryParams,
+    @Body() data: UpdateCategoryDto,
+  ) {
+    return this.inventoryService.updateCategory(params.id, data.name);
   }
 
+  @ApiEndpoint({
+    operationId: 'getAllCategories',
+    status: 200,
+    type: getAllCategoriesResponse,
+  })
   @Get('categories')
-  async getCategories() {
-    return await this.inventoryService.getProductCategories();
+  public async getAllCategories() {
+    const categories = await this.inventoryService.getAllCategories();
+    return { categories };
   }
 
-  @Get()
-  @UsePipes(new ZodValidationPipe(SearchProductSchema))
-  search(@Query() query: SearchProductParams) {
-    return this.inventoryService.search(query);
+  @ApiEndpoint({
+    operationId: 'getCategory',
+    status: 200,
+    type: CategoryResponse,
+  })
+  @ApiErrorResponses('NotFound')
+  @Get('categories/:id')
+  public async getCategory(@Param() params: CategoryParams) {
+    return this.inventoryService.getCategory(params.id);
   }
 
-  @Get(':id')
-  @UsePipes(new ZodValidationPipe(z.uuid()))
-  getProduct(@Param('id') id: string) {
-    return this.inventoryService.getProduct(id);
+  @ApiEndpoint({
+    operationId: 'deleteCategory',
+    status: 200,
+    type: CategoryResponse,
+  })
+  @ApiErrorResponses('NotFound', 'Conflict')
+  @Delete('categories/:id')
+  public async deleteCategory(@Param() params: CategoryParams) {
+    return this.inventoryService.deleteCategory(params.id);
   }
 
-  @Patch(':id')
-  @UsePipes(new ZodValidationPipe(z.uuid()))
-  updateProduct(@Param('id') id: string, @Body() data: UpdateProductParams) {
-    return this.inventoryService.updateProduct(id, data);
-  }
-
-  @Delete(':id')
-  @UsePipes(new ZodValidationPipe(z.uuid()))
-  deleteProduct(@Param('id') id: string) {
-    return this.inventoryService.deleteProduct(id);
-  }
+  // --- PRODUCT ENDPOINTS ---
 }

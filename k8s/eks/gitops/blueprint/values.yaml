@@ -1,0 +1,120 @@
+globals:
+  destinationServer: https://kubernetes.default.svc
+  clusterName: portfolio-eks-cluster
+
+system:
+  karpenter-crd:
+    chart: karpenter
+    repoURL: oci://public.ecr.aws/karpenter/karpenter-crd
+    targetRevision: 1.11.1
+    namespace: kube-system
+    syncWave: "-2"
+
+  gateway-api-crds:
+    repoURL: https://github.com/kubernetes-sigs/gateway-api
+    path: config/crd/experimental
+    targetRevision: v1.5.1
+    namespace: "kube-system"
+    syncWave: "-2"
+  
+  karpenter:
+    chart: karpenter
+    repoURL: oci://public.ecr.aws/karpenter/karpenter
+    targetRevision: 1.11.1
+    namespace: kube-system
+    syncWave: "-1"
+    values:
+      settings:
+        clusterName: portfolio-eks-cluster
+        interruptionQueue: KarpenterInterruptionQueue-portfolio-eks-cluster
+      serviceAccount:
+        name: "karpenter"
+
+  karpenter-config:
+    repoURL: https://github.com/rtnkwami/portfolio.git
+    path: k8s/eks/gitops/karpenter
+    targetRevision: HEAD
+    namespace: "kube-system"
+    syncWave: "0"
+
+  kube-prometheus-stack:
+    chart: kube-prometheus-stack
+    repoURL: oci://ghcr.io/prometheus-community/charts/kube-prometheus-stack
+    targetRevision: 84.0.1
+    namespace: monitoring
+    syncWave: "1"
+    values:
+      crds:
+        upgradeJob:
+          tolerations:
+            - key: niovial.com/workload
+              operator: Equal
+              value: observability
+              effect: NoSchedule
+          nodeSelector:
+            niovial.com/workload: observability
+      alertmanager:
+        alertmanagerSpec:
+          tolerations:
+            - key: niovial.com/workload
+              operator: Equal
+              value: observability
+              effect: NoSchedule
+          nodeSelector:
+            niovial.com/workload: observability
+      prometheusOperator:
+        tolerations:
+          - key: niovial.com/workload
+            operator: Equal
+            value: observability
+            effect: NoSchedule
+        nodeSelector:
+          niovial.com/workload: observability
+        admissionWebhooks:
+          deployment:
+            tolerations:
+              - key: niovial.com/workload
+                operator: Equal
+                value: observability
+                effect: NoSchedule
+            nodeSelector:
+              niovial.com/workload: observability
+          patch:
+            tolerations:
+              - key: niovial.com/workload
+                operator: Equal
+                value: observability
+                effect: NoSchedule
+            nodeSelector:
+              niovial.com/workload: observability
+      prometheus:
+        prometheusSpec:
+          tolerations:
+            - key: niovial.com/workload
+              operator: Equal
+              value: observability
+              effect: NoSchedule
+          resources:
+            requests:
+              memory: 500Mi
+          nodeSelector:
+            niovial.com/workload: observability
+      grafana:
+        tolerations:
+          - key: niovial.com/workload
+            operator: Equal
+            value: observability
+            effect: NoSchedule
+        nodeSelector:
+          niovial.com/workload: observability
+        resources:
+          requests:
+            memory: 600Mi
+      kube-state-metrics:
+        tolerations:
+          - key: niovial.com/workload
+            operator: Equal
+            value: observability
+            effect: NoSchedule
+        nodeSelector:
+          niovial.com/workload: observability

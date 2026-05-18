@@ -4,25 +4,82 @@ import {
   isMainModule,
   writeResponseToNodeResponse,
 } from '@angular/ssr/node';
-import express from 'express';
+import { paths } from '@atelier/contracts';
+import express, { type Express } from 'express';
 import { join } from 'node:path';
+import createClient from 'openapi-fetch';
+import 'dotenv/config';
 
 const browserDistFolder = join(import.meta.dirname, '../browser');
 
 const app = express();
 const angularApp = new AngularNodeAppEngine();
 
-/**
- * Example Express Rest API endpoints can be defined here.
- * Uncomment and define endpoints as necessary.
- *
- * Example:
- * ```ts
- * app.get('/api/{*splat}', (req, res) => {
- *   // Handle API request
- * });
- * ```
- */
+const client = createClient<paths>({ baseUrl: process.env["BACKEND_URL"] });
+
+app.use(express.json())
+
+app.get('/categories/:id', async (req, res) => {
+  const { id } = req.params;
+  const { data, error } = await client.GET('/inventory/categories/{id}', {
+    params: { path: { id } }
+  })
+  if (error) {
+    return res.json(error).status(error.statusCode);
+  }
+  return res.json(data)
+})
+
+app.patch('/categories/:id', async (req, res) => {
+  const { id } = req.params;
+  const { data, error } = await client.PATCH('/inventory/categories/{id}', {
+    params: {
+      path: { id }
+    },
+    body: req.body
+  })
+
+  if (error) {
+    console.log(error)
+    return res.status(error.statusCode).json(error);
+  }
+  return res.json(data);
+})
+
+app.get('/categories', async (_, res) => {
+  const { data, error } = await client.GET('/inventory/categories');
+  if (error) {
+    console.log(error);
+    return res.status(error.statusCode).json(error);
+  }
+  return res.json(data.categories);
+})
+
+app.post('/categories', async (req, res) => {
+  const { data, error } = await client.POST('/inventory/categories', {
+    body: req.body,
+  })
+  if (error) {
+    console.log('Error:', error);
+  }
+  return res.json(data);
+})
+
+app.delete('/categories/:id', async (req, res) => {
+  const { id } = req.params;
+  const { data, error } = await client.DELETE('/inventory/categories/{id}', {
+    params: {
+      path: { id }
+    }
+  })
+  if (error) {
+    if (error.statusCode ==- 409) {
+      return res.status(error.statusCode).json(error);
+    }
+    console.log(error);
+  }
+  return res.json(data);
+})
 
 /**
  * Serve static files from /browser
@@ -65,4 +122,4 @@ if (isMainModule(import.meta.url) || process.env['pm_id']) {
 /**
  * Request handler used by the Angular CLI (for dev-server and during build) or Firebase Cloud Functions.
  */
-export const reqHandler = createNodeRequestHandler(app);
+export const reqHandler: Express = createNodeRequestHandler(app);
