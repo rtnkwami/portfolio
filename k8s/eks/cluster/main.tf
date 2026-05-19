@@ -101,9 +101,9 @@ resource "helm_release" "cilium" {
           enabled = true
           rollOutPods = true
           tolerations = [{
-            key      = "niovial.com/workload"
+            key      = "node-role.kubernetes.io/workload"
             operator = "Equal"
-            value    = "observability"
+            value    = "monitoring"
             effect   = "NoSchedule"
           }]
         }

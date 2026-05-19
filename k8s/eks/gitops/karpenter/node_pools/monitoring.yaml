@@ -6,17 +6,15 @@ spec:
   template:
     metadata:
       labels:
-        node-role.kubernetes.io/observability: observability
-        app.kubernetes.io/managed-by: karpenter
-        niovial.com/workload: observability
+        node-role.kubernetes.io/workload: monitoring
     spec:
       nodeClassRef:
         group: karpenter.k8s.aws
         kind: EC2NodeClass
         name: default
       taints:
-        - key: niovial.com/workload
-          value: observability
+        - key: node-role.kubernetes.io/workload
+          value: monitoring
           effect: NoSchedule
       requirements:
         - key: "karpenter.sh/capacity-type"
