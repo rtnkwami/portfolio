@@ -28,7 +28,7 @@ WORKDIR /app
 RUN adduser -D -H service
 
 COPY --chown=service:service --from=base /prod/atelier/frontend/node_modules ./node_modules
-COPY --chown=service:service --from=base /prod/atelier/frontend/dist/frontend ./dist
+COPY --chown=service:service --from=base /prod/atelier/frontend/dist ./dist
 
 USER service
 
