@@ -1,3 +1,13 @@
+# YAML anchor to prevent repetition in victoria metrics chart
+.monitoring-scheduling: &monitoring-scheduling
+  nodeSelector:
+    niovial.io/node-purpose: monitoring
+  tolerations:
+    - key: niovial.io/node-purpose
+      operator: Equal
+      value: monitoring
+      effect: NoSchedule
+
 globals:
   destinationServer: https://kubernetes.default.svc
   clusterName: portfolio-eks-cluster
@@ -68,3 +78,49 @@ system:
     targetRevision: HEAD
     namespace: "kube-system"
     syncWave: "0"
+
+  victoria-metrics-k8s-stack:
+    chart: victoria-metrics-k8s-stack
+    repoURL: oci://ghcr.io/victoriametrics/helm-charts/victoria-metrics-k8s-stack
+    targetRevision: 0.78.0
+    namespace: monitoring
+    syncWave: "1"
+    values:
+      kube-state-metrics:
+        <<: *monitoring-scheduling
+      grafana:
+        <<: *monitoring-scheduling
+      victoria-metrics-operator:
+        <<: *monitoring-scheduling
+      alertmanager:
+        spec:
+          <<: *monitoring-scheduling
+      vmsingle:
+        spec:
+          <<: *monitoring-scheduling
+      vmalert:
+        spec:
+          <<: *monitoring-scheduling
+      vmagent:
+        spec:
+          <<: *monitoring-scheduling
+    syncOptions:
+      - RespectIgnoreDifferences=true
+    ignoreDifferences:
+      - group: admissionregistration.k8s.io
+        kind: ValidatingWebhookConfiguration
+        jqPathExpressions:
+          - .webhooks[]?.clientConfig.caBundle
+      - kind: Secret
+        jsonPointers:
+          - /data/admin-password
+      - group: ""
+        kind: Secret
+        name: validation
+        namespace: monitoring
+        jsonPointers:
+          - /data
+      - group: apps
+        kind: Deployment
+        jsonPointers:
+          - /spec/template/metadata/annotations/checksum~1secret
