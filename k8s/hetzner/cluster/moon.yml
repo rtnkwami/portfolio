@@ -33,10 +33,15 @@ tasks:
     options:
       cache: false
 
+  clean:
+    command: tofu state rm 'module.kubernetes.talos_machine_secrets.this'
+    toolchain: 'system'
+    deps: ['~:init']
+
   destroy:
     command: 'tofu destroy'
     args: '--auto-approve'
     toolchain: 'system'
-    deps: ['~:init']
+    deps: ['~:init', 'clean']
     options:
       cache: false
