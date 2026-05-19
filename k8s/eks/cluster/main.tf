@@ -228,9 +228,10 @@ resource "helm_release" "argocd" {
 
 module "karpenter" {
   source = "terraform-aws-modules/eks/aws//modules/karpenter"
-  version = "~>21.0"
+  version = "~>21.20"
 
   cluster_name = module.eks.cluster_name
+  enable_inline_policy = true
   
   # role nodes need to use to be authorized to join eks cluster
   node_iam_role_name = "KarpenterNodeRole-${module.eks.cluster_name}"
