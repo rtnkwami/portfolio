@@ -28,8 +28,10 @@ WORKDIR /app
 RUN adduser -D -H service
 
 COPY --chown=service:service --from=base /prod/atelier/frontend/node_modules ./node_modules
-COPY --chown=service:service --from=base /prod/atelier/frontend/dist ./dist
+COPY --chown=service:service --from=base /prod/atelier/frontend/dist/frontend ./dist
 
 USER service
+
+EXPOSE 4000
 
 CMD ["node", "dist/server/server.mjs"]
