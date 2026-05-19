@@ -11,4 +11,11 @@ syncInjectedDepsAfterScripts:
 
 strictDepBuilds: false
 
-allowBuilds: {}
+allowBuilds:
+  '@nestjs/core': false
+  '@parcel/watcher': false
+  '@scarf/scarf': false
+  '@swc/core': false
+  esbuild: false
+  lmdb: false
+  msgpackr-extract: false
