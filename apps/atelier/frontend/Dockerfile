@@ -32,6 +32,7 @@ COPY --chown=service:service --from=base /prod/atelier/frontend/dist/frontend ./
 
 USER service
 
+ENV HOST="0.0.0.0"
 EXPOSE 4000
 
 CMD ["node", "dist/server/server.mjs"]
