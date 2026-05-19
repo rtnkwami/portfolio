@@ -162,6 +162,7 @@ module "eks_managed_node_group" {
 
   labels = {
     "karpenter.sh/controller" = "true"
+    "niovial.io/node-purpose" = "system"
   }
 
   update_config = {
@@ -177,6 +178,18 @@ resource "aws_eks_addon" "coredns" {
   cluster_name = module.eks.cluster_name
   addon_name = "coredns"
   resolve_conflicts_on_update = "PRESERVE"
+  
+  configuration_values = jsonencode({
+    nodeSelector = {
+      "niovial.io/node-purpose" = "system"
+    }
+    tolerations = [{
+      key      = "CriticalAddonsOnly"
+      operator = "Equal"
+      value    = "true"
+      effect   = "NoSchedule"
+    }]
+  })
 
   # coredns requires Ready nodes with a functioning CNI to schedule.
   # It is intentionally managed outside the eks module to ensure it is only
@@ -203,6 +216,9 @@ resource "helm_release" "argocd" {
             effect   = "NoSchedule"
           }
         ]
+        node_selector = {
+          "niovial.io/node-purpose" = "system"
+        }
       }
     })
   ]
