@@ -1,6 +1,6 @@
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
-  version = "6.6.1"
+  version = "~>6.0"
 
   name            = "${var.project_name}-vpc"
   cidr            = var.vpc_cidr
@@ -28,7 +28,7 @@ module "vpc" {
 
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"
-  version = "21.18.0"
+  version = "~>21.0"
 
   name               = "${var.project_name}-eks-cluster"
   kubernetes_version = "1.35"
@@ -74,7 +74,7 @@ resource "helm_release" "cilium" {
   namespace = "kube-system"
   repository = "oci://quay.io/cilium/charts"
   chart = "cilium"
-  version = "1.19.3"
+  version = "1.19.4"
   # wait=false is intentional. Cilium pods cannot become Ready until nodes exist,
   # but nodes depend on Cilium manifests being present. Setting wait=false breaks
   # this deadlock — manifests are applied to the API server immediately, and Cilium
@@ -101,9 +101,9 @@ resource "helm_release" "cilium" {
           enabled = true
           rollOutPods = true
           tolerations = [{
-            key      = "niovial.com/workload"
+            key      = "niovial.io/node-purpose"
             operator = "Equal"
-            value    = "observability"
+            value    = "monitoring"
             effect   = "NoSchedule"
           }]
         }
@@ -162,6 +162,7 @@ module "eks_managed_node_group" {
 
   labels = {
     "karpenter.sh/controller" = "true"
+    "niovial.io/node-purpose" = "system"
   }
 
   update_config = {
@@ -177,6 +178,18 @@ resource "aws_eks_addon" "coredns" {
   cluster_name = module.eks.cluster_name
   addon_name = "coredns"
   resolve_conflicts_on_update = "PRESERVE"
+  
+  configuration_values = jsonencode({
+    nodeSelector = {
+      "niovial.io/node-purpose" = "system"
+    }
+    tolerations = [{
+      key      = "CriticalAddonsOnly"
+      operator = "Equal"
+      value    = "true"
+      effect   = "NoSchedule"
+    }]
+  })
 
   # coredns requires Ready nodes with a functioning CNI to schedule.
   # It is intentionally managed outside the eks module to ensure it is only
@@ -190,7 +203,7 @@ resource "helm_release" "argocd" {
   create_namespace = true
   repository = "oci://ghcr.io/argoproj/argo-helm"
   chart = "argo-cd"
-  version = "9.5.4"
+  version = "9.5.14"
   values = [
     yamlencode({
       global = {
@@ -203,6 +216,9 @@ resource "helm_release" "argocd" {
             effect   = "NoSchedule"
           }
         ]
+        node_selector = {
+          "niovial.io/node-purpose" = "system"
+        }
       }
     })
   ]
@@ -212,9 +228,10 @@ resource "helm_release" "argocd" {
 
 module "karpenter" {
   source = "terraform-aws-modules/eks/aws//modules/karpenter"
-  version = "21.18.0"
+  version = "~>21.20"
 
   cluster_name = module.eks.cluster_name
+  enable_inline_policy = true
   
   # role nodes need to use to be authorized to join eks cluster
   node_iam_role_name = "KarpenterNodeRole-${module.eks.cluster_name}"

@@ -29,6 +29,28 @@ system:
         interruptionQueue: KarpenterInterruptionQueue-portfolio-eks-cluster
       serviceAccount:
         name: "karpenter"
+      nodeSelector:
+        niovial.io/node-purpose: system
+
+  cnpg:
+    chart: cloudnative-pg
+    repoURL: oci://ghcr.io/cloudnative-pg/charts/cloudnative-pg
+    targetRevision: 0.28.2
+    namespace: cnpg-system
+    syncWave: "-1"
+    values:
+      nodeSelector:
+        niovial.io/node-purpose: system
+
+  keda:
+    chart: keda
+    repoURL: https://kedacore.github.io/charts
+    targetRevision: 2.19.0
+    namespace: keda
+    syncWave: "-1"
+    values:
+      nodeSelector:
+        niovial.io/node-purpose: system
 
   karpenter-config:
     repoURL: https://github.com/rtnkwami/portfolio.git
@@ -36,85 +58,3 @@ system:
     targetRevision: HEAD
     namespace: "kube-system"
     syncWave: "0"
-
-  kube-prometheus-stack:
-    chart: kube-prometheus-stack
-    repoURL: oci://ghcr.io/prometheus-community/charts/kube-prometheus-stack
-    targetRevision: 84.0.1
-    namespace: monitoring
-    syncWave: "1"
-    values:
-      crds:
-        upgradeJob:
-          tolerations:
-            - key: niovial.com/workload
-              operator: Equal
-              value: observability
-              effect: NoSchedule
-          nodeSelector:
-            niovial.com/workload: observability
-      alertmanager:
-        alertmanagerSpec:
-          tolerations:
-            - key: niovial.com/workload
-              operator: Equal
-              value: observability
-              effect: NoSchedule
-          nodeSelector:
-            niovial.com/workload: observability
-      prometheusOperator:
-        tolerations:
-          - key: niovial.com/workload
-            operator: Equal
-            value: observability
-            effect: NoSchedule
-        nodeSelector:
-          niovial.com/workload: observability
-        admissionWebhooks:
-          deployment:
-            tolerations:
-              - key: niovial.com/workload
-                operator: Equal
-                value: observability
-                effect: NoSchedule
-            nodeSelector:
-              niovial.com/workload: observability
-          patch:
-            tolerations:
-              - key: niovial.com/workload
-                operator: Equal
-                value: observability
-                effect: NoSchedule
-            nodeSelector:
-              niovial.com/workload: observability
-      prometheus:
-        prometheusSpec:
-          tolerations:
-            - key: niovial.com/workload
-              operator: Equal
-              value: observability
-              effect: NoSchedule
-          resources:
-            requests:
-              memory: 500Mi
-          nodeSelector:
-            niovial.com/workload: observability
-      grafana:
-        tolerations:
-          - key: niovial.com/workload
-            operator: Equal
-            value: observability
-            effect: NoSchedule
-        nodeSelector:
-          niovial.com/workload: observability
-        resources:
-          requests:
-            memory: 600Mi
-      kube-state-metrics:
-        tolerations:
-          - key: niovial.com/workload
-            operator: Equal
-            value: observability
-            effect: NoSchedule
-        nodeSelector:
-          niovial.com/workload: observability
