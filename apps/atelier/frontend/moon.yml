@@ -7,5 +7,6 @@ dependsOn:
 
 tasks:
   build:
+    command: 'pnpm build'
     deps:
       - '^:build'
