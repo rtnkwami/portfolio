@@ -32,4 +32,4 @@ COPY --chown=service:service --from=base /prod/atelier/frontend/dist/frontend ./
 
 USER service
 
-CMD ["node", "dist/main.js"]
+CMD ["node", "dist/server/server.mjs"]
