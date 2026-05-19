@@ -41,6 +41,11 @@ system:
     values:
       nodeSelector:
         niovial.io/node-purpose: system
+      tolerations:
+        - key: CriticalAddonsOnly
+          operator: Equal
+          value: "true"
+          effect: NoSchedule
 
   keda:
     chart: keda
@@ -51,6 +56,11 @@ system:
     values:
       nodeSelector:
         niovial.io/node-purpose: system
+      tolerations:
+        - key: CriticalAddonsOnly
+          operator: Equal
+          value: "true"
+          effect: NoSchedule
 
   karpenter-config:
     repoURL: https://github.com/rtnkwami/portfolio.git
