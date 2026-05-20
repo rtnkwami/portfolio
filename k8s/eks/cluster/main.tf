@@ -139,6 +139,7 @@ module "eks_managed_node_group" {
     cilium_eni = data.aws_iam_policy.cni_policy.arn
     worker_node = data.aws_iam_policy.worker_node_policy.arn
     image_pull_only = data.aws_iam_policy.ecr_pull_only_policy.arn
+    ebs_csi_driver = data.aws_iam_policy.ebs_csi_driver_policy.arn
   }
 
   min_size = 1
@@ -198,6 +199,25 @@ resource "aws_eks_addon" "coredns" {
   depends_on = [ module.eks_managed_node_group ]
 }
 
+resource "helm_release" "ebs_csi_driver" {
+  name = "aws-ebs-csi-driver"
+  namespace = "kube-system"
+  repository = "https://kubernetes-sigs.github.io/aws-ebs-csi-driver"
+  chart = "aws-ebs-csi-driver"
+  version = "2.60.0"
+  values = [
+    yamlencode({
+      controller = {
+        nodeSelector = {
+          "niovial.io/node-purpose" = "system"
+        }
+      }
+    })
+  ]
+
+  depends_on = [ module.eks_managed_node_group ]
+}
+
 resource "helm_release" "argocd" {
   name = "argocd"
   namespace = "argocd"
@@ -208,7 +228,6 @@ resource "helm_release" "argocd" {
   values = [
     yamlencode({
       global = {
-        # CriticalAddonsOnly toleration required because all nodes carry this taint.
         tolerations = [
           {
             key      = "CriticalAddonsOnly"
