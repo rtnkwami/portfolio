@@ -91,7 +91,13 @@ system:
       grafana:
         <<: *monitoring-scheduling
       victoria-metrics-operator:
-        <<: *monitoring-scheduling
+        nodeSelector:
+          niovial.io/node-purpose: system
+        tolerations:
+          - key: CriticalAddonsOnly
+            operator: Equal
+            value: "true"
+            effect: NoSchedule
       alertmanager:
         spec:
           <<: *monitoring-scheduling

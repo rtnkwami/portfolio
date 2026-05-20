@@ -1,6 +1,6 @@
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
-  version = "~>6.0"
+  version = local.versions.modules.vpc
 
   name            = "${var.project_name}-vpc"
   cidr            = var.vpc_cidr
@@ -28,7 +28,7 @@ module "vpc" {
 
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"
-  version = "~>21.0"
+  version = local.versions.modules.eks
 
   name               = "${var.project_name}-eks-cluster"
   kubernetes_version = "1.35"
@@ -47,11 +47,6 @@ module "eks" {
   subnet_ids = module.vpc.private_subnets
 
   addons = {
-    # eks-pod-identity-agent must be installed before compute (before_compute = true)
-    # because it needs to be present on nodes when they join.
-    # vpc-cni and kube-proxy are intentionally omitted; Cilium replaces both of them.
-    # coredns is intentionally omitted here — it requires nodes to be Ready before
-    # it can schedule, so it is managed separately after the node group is created.
     eks-pod-identity-agent = {
       before_compute = true
     }
@@ -67,6 +62,12 @@ module "eks" {
     ResourceType = "Compute"
     ManagedBy    = "OpenTofu"
   }
+
+  tags = {
+    Project = var.project_name
+    ResourceType = "Compute"
+    ManagedBy = "OpenTofu"
+  }
 }
 
 resource "helm_release" "cilium" {
@@ -74,21 +75,12 @@ resource "helm_release" "cilium" {
   namespace = "kube-system"
   repository = "oci://quay.io/cilium/charts"
   chart = "cilium"
-  version = "1.19.4"
-  # wait=false is intentional. Cilium pods cannot become Ready until nodes exist,
-  # but nodes depend on Cilium manifests being present. Setting wait=false breaks
-  # this deadlock — manifests are applied to the API server immediately, and Cilium
-  # becomes Ready naturally once the node group is created.
+  version = local.versions.helm_releases.cilium
   wait = false
 
   values = [
     yamlencode({
       operator = {
-        # The Cilium operator is a Deployment, not a DaemonSet.
-        # Unlike DaemonSets, Deployments do not automatically tolerate node taints.
-        # Without this toleration, the operator cannot schedule on the tainted nodes,
-        # which means Cilium never initializes, network-unavailable taint is never
-        # removed, and coredns stays pending forever.
         tolerations = [{
           key = "CriticalAddonsOnly"
           operator = "Equal"
@@ -122,7 +114,7 @@ resource "helm_release" "cilium" {
 
 module "eks_managed_node_group" {
   source = "terraform-aws-modules/eks/aws//modules/eks-managed-node-group"
-  version = "21.18.0"
+  version = local.versions.modules.eks
 
   name = "system-nodes"
   cluster_name = module.eks.cluster_name
@@ -140,6 +132,7 @@ module "eks_managed_node_group" {
     worker_node = data.aws_iam_policy.worker_node_policy.arn
     image_pull_only = data.aws_iam_policy.ecr_pull_only_policy.arn
     ebs_csi_driver = data.aws_iam_policy.ebs_csi_driver_policy.arn
+    ssm_access_policy = data.aws_iam_policy.ssm_access_policy.arn
   }
 
   min_size = 1
@@ -150,9 +143,6 @@ module "eks_managed_node_group" {
   ami_type = "AL2023_ARM_64_STANDARD"
   capacity_type = "SPOT"
 
-  # CriticalAddonsOnly taint prevents workload pods from scheduling on these nodes.
-  # Only pods that explicitly tolerate this taint (Cilium operator, ArgoCD, coredns)
-  # will be allowed to run here.
   taints = {
     critical_addons = {
       key    = "CriticalAddonsOnly"
@@ -160,19 +150,15 @@ module "eks_managed_node_group" {
       effect = "NO_SCHEDULE"
     },
   }
-
   labels = {
     "karpenter.sh/controller" = "true"
     "niovial.io/node-purpose" = "system"
     "node-role.kubernetes.io/system" = "system"
   }
-
   update_config = {
     max_unavailable = 1
   }
-  # Node group must wait for Cilium manifests to be applied to the API server.
-  # When nodes join, the Cilium DaemonSet (which tolerates all taints) schedules
-  # immediately, initializes the network, and removes the network-unavailable taint.
+
   depends_on = [ helm_release.cilium ]
 }
 
@@ -193,9 +179,6 @@ resource "aws_eks_addon" "coredns" {
     }]
   })
 
-  # coredns requires Ready nodes with a functioning CNI to schedule.
-  # It is intentionally managed outside the eks module to ensure it is only
-  # created after the node group is Ready and Cilium has initialized the network.
   depends_on = [ module.eks_managed_node_group ]
 }
 
@@ -204,7 +187,7 @@ resource "helm_release" "ebs_csi_driver" {
   namespace = "kube-system"
   repository = "https://kubernetes-sigs.github.io/aws-ebs-csi-driver"
   chart = "aws-ebs-csi-driver"
-  version = "2.60.0"
+  version = local.versions.helm_releases.ebs-csi-driver
   values = [
     yamlencode({
       controller = {
@@ -224,7 +207,7 @@ resource "helm_release" "argocd" {
   create_namespace = true
   repository = "oci://ghcr.io/argoproj/argo-helm"
   chart = "argo-cd"
-  version = "9.5.14"
+  version = local.versions.helm_releases.argocd
   values = [
     yamlencode({
       global = {
@@ -242,20 +225,14 @@ resource "helm_release" "argocd" {
       }
     })
   ]
-  # depends_on coredns ensures the addon is present before ArgoCD pods attempt to schedule.
   depends_on = [ aws_eks_addon.coredns ]
 }
 
 module "karpenter" {
   source = "terraform-aws-modules/eks/aws//modules/karpenter"
-  version = "~>21.20"
-
+  version = local.versions.modules.eks
   cluster_name = module.eks.cluster_name
-  enable_inline_policy = true
-  
-  # role nodes need to use to be authorized to join eks cluster
   node_iam_role_name = "KarpenterNodeRole-${module.eks.cluster_name}"
-  # refuse prefix auto-append to make reference in karpenter crds easier
   node_iam_role_use_name_prefix = false
   enable_spot_termination = true
   queue_name = "KarpenterInterruptionQueue-${module.eks.cluster_name}"
