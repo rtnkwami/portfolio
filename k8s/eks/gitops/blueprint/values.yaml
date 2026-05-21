@@ -148,3 +148,4 @@ system:
     targetRevision: HEAD
     namespace: atelier
     syncWave: "1"
+    kustomize: true
