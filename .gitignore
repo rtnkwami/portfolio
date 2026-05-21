@@ -10,6 +10,6 @@ dist/
 coverage
 .env
 
-*terraform*
+.terraform/
 k8s/**/outputs
 *.tfvars
