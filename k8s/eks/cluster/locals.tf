@@ -14,10 +14,6 @@ data "aws_iam_policy" "ecr_pull_only_policy" {
   name = "AmazonEC2ContainerRegistryPullOnly"
 }
 
-data "aws_iam_policy" "ebs_csi_driver_policy" {
-  name = "AmazonEBSCSIDriverPolicy"
-}
-
 data "aws_iam_policy" "ssm_access_policy" {
   name = "AmazonSSMManagedInstanceCore"
 }

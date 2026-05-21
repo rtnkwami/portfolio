@@ -70,6 +70,21 @@ module "eks" {
   }
 }
 
+module "aws_ebs_csi_pod_identity" {
+  source = "terraform-aws-modules/eks-pod-identity/aws"
+
+  name = "aws-ebs-csi"
+  attach_aws_ebs_csi_policy = true
+
+  associations = {
+    this = {
+      cluster_name    = module.eks.cluster_name
+      namespace       = "kube-system"
+      service_account = "ebs-csi-controller-sa"
+    }
+  }
+}
+
 resource "helm_release" "cilium" {
   name = "cilium"
   namespace = "kube-system"
@@ -131,7 +146,6 @@ module "eks_managed_node_group" {
     cilium_eni = data.aws_iam_policy.cni_policy.arn
     worker_node = data.aws_iam_policy.worker_node_policy.arn
     image_pull_only = data.aws_iam_policy.ecr_pull_only_policy.arn
-    ebs_csi_driver = data.aws_iam_policy.ebs_csi_driver_policy.arn
     ssm_access_policy = data.aws_iam_policy.ssm_access_policy.arn
   }
 
