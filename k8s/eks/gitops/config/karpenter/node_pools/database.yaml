@@ -23,7 +23,7 @@ spec:
           values: ["on-demand"]
         - key: "karpenter.k8s.aws/instance-category"
           operator: In
-          values: ["m"]
+          values: ["m", "c", "r"]
         - key: "kubernetes.io/arch"
           operator: In
           values: ["arm64"]
