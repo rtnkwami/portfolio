@@ -21,6 +21,9 @@ spec:
           limits:
             memory: "256Mi"
             cpu: "200m"
+        env:
+          - name: BACKEND_URL
+            value: atelier-backend
         ports:
         - name: frontend
           containerPort: 4000
