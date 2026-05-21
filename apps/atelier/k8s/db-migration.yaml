@@ -2,6 +2,9 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: atelier-db-migration
+  argocd.argoproj.io/hook: Sync
+  argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
+  argocd.argoproj.io/sync-wave: "-2"
 spec:
   template:
     spec:

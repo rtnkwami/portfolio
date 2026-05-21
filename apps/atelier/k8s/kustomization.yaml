@@ -9,4 +9,5 @@ resources:
   - frontend-service.yaml
   - backend-deployment.yaml
   - backend-service.yaml
+  - db-migration.yaml
   - cnpg-cluster.yaml

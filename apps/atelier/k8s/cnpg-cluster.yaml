@@ -4,6 +4,8 @@ metadata:
   name: atelier-db
   labels:
     app.kubernetes.io/component: database
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"
 spec:
   instances: 3
   resources:
@@ -14,6 +16,7 @@ spec:
       memory: "4Gi"
       cpu: "2000m"
   storage:
+    storageClass: database
     size: "20Gi"
   postgresql:
     synchronous:
@@ -24,12 +27,12 @@ spec:
       shared_buffers: "1Gi"
   affinity:
     nodeSelector:
-      node-role.kubernetes.io/workload: database
+      niovial.io/node-purpose: database
     enablePodAntiAffinity: true
     topologyKey: topology.kubernetes.io/zone
     podAntiAffinityType: required
     tolerations:
-      - key: node-role.kubernetes.io/workload
+      - key: niovial.io/node-purpose
         operator: Equal
         value: database
         effect: NoSchedule
