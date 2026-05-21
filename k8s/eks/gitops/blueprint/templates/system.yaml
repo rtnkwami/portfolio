@@ -26,6 +26,8 @@ spec:
     {{- else }}
     directory:
       recurse: true
+    {{- end }}
+    {{- end }}
     targetRevision: {{ $component.targetRevision }}
     {{- end }}
     {{- if $component.values }}
