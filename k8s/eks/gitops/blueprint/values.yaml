@@ -141,3 +141,10 @@ system:
         kind: Deployment
         jsonPointers:
           - /spec/template/metadata/annotations/checksum~1secret
+
+  atelier:
+    repoURL: https://github.com/rtnkwami/portfolio.git
+    path: apps/atelier/k8s
+    targetRevision: HEAD
+    namespace: atelier
+    syncWave: "1"

@@ -155,7 +155,7 @@ module "eks_managed_node_group" {
 
   instance_types = ["t4g.medium"]
   ami_type = "AL2023_ARM_64_STANDARD"
-  capacity_type = "SPOT"
+  capacity_type = "ON_DEMAND"
 
   taints = {
     critical_addons = {
