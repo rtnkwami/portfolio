@@ -153,7 +153,6 @@ module "eks_managed_node_group" {
   labels = {
     "karpenter.sh/controller" = "true"
     "niovial.io/node-purpose" = "system"
-    "node-role.kubernetes.io/system" = "system"
   }
   update_config = {
     max_unavailable = 1
@@ -178,25 +177,6 @@ resource "aws_eks_addon" "coredns" {
       effect   = "NoSchedule"
     }]
   })
-
-  depends_on = [ module.eks_managed_node_group ]
-}
-
-resource "helm_release" "ebs_csi_driver" {
-  name = "aws-ebs-csi-driver"
-  namespace = "kube-system"
-  repository = "https://kubernetes-sigs.github.io/aws-ebs-csi-driver"
-  chart = "aws-ebs-csi-driver"
-  version = local.versions.helm_releases.ebs_csi_driver
-  values = [
-    yamlencode({
-      controller = {
-        nodeSelector = {
-          "niovial.io/node-purpose" = "system"
-        }
-      }
-    })
-  ]
 
   depends_on = [ module.eks_managed_node_group ]
 }

@@ -42,6 +42,17 @@ system:
       nodeSelector:
         niovial.io/node-purpose: system
 
+  ebs-csi-driver:
+    chart: aws-ebs-csi-driver
+    repoURL: https://kubernetes-sigs.github.io/aws-ebs-csi-driver
+    targetRevision: 2.60.0
+    namespace: kube-system
+    syncWave: "-1"
+    values:
+      controller:
+        nodeSelector:
+          niovial.io/node-purpose: system
+
   cnpg:
     chart: cloudnative-pg
     repoURL: oci://ghcr.io/cloudnative-pg/charts/cloudnative-pg
@@ -72,9 +83,9 @@ system:
           value: "true"
           effect: NoSchedule
 
-  karpenter-config:
+  cluster-config:
     repoURL: https://github.com/rtnkwami/portfolio.git
-    path: k8s/eks/gitops/karpenter
+    path: k8s/eks/gitops/config
     targetRevision: HEAD
     namespace: "kube-system"
     syncWave: "0"
