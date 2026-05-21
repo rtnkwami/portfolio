@@ -21,12 +21,8 @@ spec:
     {{- else }}
     repoURL: {{ $component.repoURL }}
     path: {{ $component.path }}
-    {{- if $component.kustomize }}
-    kustomize: {}
-    {{- else }}
     directory:
       recurse: true
-    {{- end }}
     targetRevision: {{ $component.targetRevision }}
     {{- end }}
     {{- if $component.values }}

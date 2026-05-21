@@ -4,6 +4,7 @@ metadata:
   name: atelier-frontend
 spec:
   selector:
+    app.kubernetes.io/name: atelier
     app.kubernetes.io/component: frontend
   ports:
   - port: 4000

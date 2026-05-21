@@ -5,6 +5,8 @@ metadata:
   argocd.argoproj.io/hook: Sync
   argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
   argocd.argoproj.io/sync-wave: "-2"
+  labels:
+    app.kubernetes.io/name: atelier
 spec:
   template:
     spec:
