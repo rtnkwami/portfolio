@@ -25,7 +25,7 @@ spec:
       number: 1
       dataDurability: required
     parameters:
-      shared_buffers: "1Gi"
+      shared_buffers: "1GB"
   affinity:
     nodeSelector:
       niovial.io/node-purpose: database
