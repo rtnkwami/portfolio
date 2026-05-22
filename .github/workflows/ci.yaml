@@ -60,6 +60,7 @@ jobs:
           username: ${{ vars.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
       
+      - uses: docker/setup-qemu-action@v3
       - uses: docker/setup-buildx-action@v4
 
       - uses: moonrepo/setup-toolchain@v0
@@ -81,6 +82,7 @@ jobs:
           push: true
           context: .
           file: apps/${{ matrix.app }}/Dockerfile
+          platforms: linux/amd64,linux/arm64
           tags: |
               ${{ vars.DOCKERHUB_USERNAME }}/${{ env.REPOSITORY }}:${{ env.IMAGE_TAG }}
               ${{ vars.DOCKERHUB_USERNAME }}/${{ env.REPOSITORY }}:latest

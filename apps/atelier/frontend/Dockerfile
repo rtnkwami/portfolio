@@ -2,7 +2,6 @@ FROM node:24-alpine AS base
 
 WORKDIR /app
 
-# Setup pnpm
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME/bin:$PATH"
 ENV MOON_TOOLCHAIN_FORCE_GLOBALS=true
