@@ -100,6 +100,10 @@ system:
       kube-state-metrics:
         <<: *monitoring-scheduling
       grafana:
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "500m"
         <<: *monitoring-scheduling
       victoria-metrics-operator:
         nodeSelector:
@@ -112,9 +116,17 @@ system:
       alertmanager:
         spec:
           <<: *monitoring-scheduling
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "250m"
       vmsingle:
         spec:
           <<: *monitoring-scheduling
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "500m"
       vmalert:
         spec:
           <<: *monitoring-scheduling
